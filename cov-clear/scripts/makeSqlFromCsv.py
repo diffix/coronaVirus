@@ -146,6 +146,11 @@ def addVal(ci,val):
         return "NULL"
     if ci['type'] == 'text':
         new = val.replace("'","''")
+        if ci['colName'].find('post') >= 0 or ci['colName'].find('zip') >= 0:
+            # This is a small attempt at making the zip codes uniform.
+            # We force upper case and remove spaces
+            new = new.upper()
+            new = new.replace(' ','')
         return str(f"'{new}'")
     elif ci['type'] == 'timestamp without time zone':
         (date,time) = val.split()
