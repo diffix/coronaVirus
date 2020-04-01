@@ -2,9 +2,12 @@ import json
 import sqlite3
 import os.path
 import pprint
-
+import random
 
 '''
+Run stand-alone to populate the database.
+Otherwise import to use the postalLatLong class.
+
 geonames-postal-code.json is a list of data fields like this:
 {   'datasetid': 'geonames-postal-code@public-us',
     'fields': {   'accuracy': '4',
@@ -24,23 +27,89 @@ also accuracy somewhere
 '''
 
 class postalLatLong:
+    ''' Used to map country and post code into lat and long
+
+        * Data sources:
+            * https://data.opendatasoft.com/explore/dataset/geonames-postal-code
+                exported as json into geonames-postal-code.json
+                * licensed as https://creativecommons.org/licenses/by/4.0/
+            * table of country name to country code 
+                * countryCodes.json
+                * (I forget where I got it)
+
+        * From above two data sources, builds sqlite table with columns:
+            * admin_code,accuracy,admin_name,cc,country,lat,long,post
+                * cc is country code
+                * country is country name
+                * lat is latitude (decimal format)
+                * long is longitude (decimal format)
+                * post is post code / zip code
+
+        * On init, generates the database if force=True or is the database
+            * doesn't already exist (geonames.db)
+
+        * Exposes the following API:
+            * getCC(country): returns country code from country name
+                * works only on exact match
+            * getLatLong(cc,zipCode): returns lat and long from country
+                * code and post/zip code
+                * Searches for best match (longest zip code prefix)
+                * Selects randomly if multiple lat/long matches
+    '''
     _dbName = 'geonames.db'
     _data = None
     _ccCodes = None
     _dataFile = 'geonames-postal-code.json'
     _ccFile = 'countryCodes.json'
+    _ccIndex = {}
+    _countryIndex = {}
     _conn = None
     _cur = None
     pp = None
 
     def __init__(self,flush=False):
         self.pp = pprint.PrettyPrinter(indent=4)
+        if os.path.isfile(self._ccFile):
+            with open(self._ccFile, 'r') as fi:
+                self._ccCodes = json.load(fi)
+        else:
+            print(f"Can't find file {self.ccFile}")
+            quit()
+        # Index the country codes by country code
+        self._ccIndex = {}
+        self._countryIndex = {}
+        for cc in self._ccCodes:
+            self._ccIndex[cc['Code']] = cc['Name']
+            self._countryIndex[cc['Name']] = cc['Code']
+
         if flush is False and os.path.isfile(self._dbName):
             # We have already built the database
             self._conn = sqlite3.connect(self._dbName)
             self._cur = self._conn.cursor()
         else:
             self._buildDatabase()
+        return
+
+    def getCC(self,country):
+        if country in self._countryIndex:
+            return self._countryIndex[country]
+        return None
+
+    def getLatLong(self,cc,zipCode):
+        for tryLen in reversed(range(len(zipCode))):
+            tryZip = zipCode[:(tryLen+1)]
+            sql = f'''
+                SELECT lat, long
+                FROM zip_lat_long
+                WHERE cc = '{cc}' AND
+                substr(post, 1, {tryLen+1}) = '{tryZip}'
+            '''
+            self._cur.execute(sql)
+            ans = self._cur.fetchall()
+            if len(ans) != 0:
+                element = random.choice(ans)
+                return(element[0],element[1])
+        return(None,None)
 
     def _buildDatabase(self):
         if os.path.isfile(self._dataFile):
@@ -49,16 +118,6 @@ class postalLatLong:
         else:
             print(f"Can't find file {self.dataFile}")
             quit()
-        if os.path.isfile(self._ccFile):
-            with open(self._ccFile, 'r') as fi:
-                self._ccCodes = json.load(fi)
-        else:
-            print(f"Can't find file {self.ccFile}")
-            quit()
-        # Index the country codes by country code
-        ccIndex = {}
-        for cc in self._ccCodes:
-            ccIndex[cc['Code']] = cc['Name']
         self._conn = sqlite3.connect(self._dbName)
         self._cur = self._conn.cursor()
         self._cur.execute("DROP TABLE IF EXISTS zip_lat_long")
@@ -74,9 +133,13 @@ class postalLatLong:
              ''')
         for record in self._data:
             datum = self._getDatumFromRecord(record)
-            self._addCountryToDatum(datum,ccIndex)
+            self._addCountryToDatum(datum)
             sql = self._makeInsertSql(datum)
             self._cur.execute(sql)
+        self._conn.commit()
+        self._cur.execute('''
+            CREATE INDEX cc_post_index ON zip_lat_long (cc,post)
+        ''')
         self._conn.commit()
 
     def _makeInsertSql(self,datum):
@@ -102,11 +165,11 @@ class postalLatLong:
         sql += str(f"'{datum['post']}')")
         return sql
 
-    def _addCountryToDatum(self,datum,ccIndex):
-        if datum['cc'] not in ccIndex:
+    def _addCountryToDatum(self,datum):
+        if datum['cc'] not in self._ccIndex:
             print(f"CC {datum['cc']} not in ccIndex!")
             quit()
-        datum['country'] = ccIndex[datum['cc']]
+        datum['country'] = self._ccIndex[datum['cc']]
 
     def _getDatumFromRecord(self,record):
         datum = {}
@@ -121,7 +184,10 @@ class postalLatLong:
         datum['lat'] = fd['latitude']
         datum['long'] = fd['longitude']
         datum['cc'] = fd['country_code']
-        datum['post'] = fd['postal_code']
+        # force upper case and remove spaces on postal codes
+        new = fd['postal_code'].upper()
+        new = new.replace(' ','')
+        datum['post'] = new
         if 'admin_code1' in fd:
             datum['admin_code'] = fd['admin_code1']
         if 'admin_name1' in fd:
@@ -137,4 +203,4 @@ class postalLatLong:
 
 if __name__ == "__main__":
     pp = pprint.PrettyPrinter(indent=4)
-    x = postalLatLong(flush=False)
+    x = postalLatLong(flush=True)

@@ -26,3 +26,36 @@ makeSqlFromCsv.py does the following:
 
 * Currently 'Day dd Month' strings are assumed to be 2020
 * Automatically choosing column names probably a bad idea, because a small change in the question might lead to a new column name
+
+## postalLatLong.py
+
+Used to map country and post code into lat and long
+
+### Data sources:
+* https://data.opendatasoft.com/explore/dataset/geonames-postal-code
+  * exported as json into geonames-postal-code.json
+  * licensed as https://creativecommons.org/licenses/by/4.0/
+* table of country name to country code 
+  * countryCodes.json
+  * (I forget where I got it)
+
+From above two data sources, builds sqlite table with columns:
+* `admin_code,accuracy,admin_name,cc,country,lat,long,post`
+  * cc is country code
+  * country is country name
+  * lat is latitude (decimal format)
+  * long is longitude (decimal format)
+  * post is post code / zip code
+
+### What it does
+
+* On init, generates the database if force=True or if the database doesn't already exist (geonames.db)
+
+Exposes the following API:
+* getCC(country): returns country code from country name
+  * works only on exact match
+* getLatLong(cc,zipCode): returns lat and long from country
+  * code and post/zip code
+  * Searches for best match (longest zip code prefix)
+  * Selects randomly if multiple lat/long matches
+
