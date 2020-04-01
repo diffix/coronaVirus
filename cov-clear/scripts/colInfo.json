@@ -1,0 +1,874 @@
+[
+    {
+        "phrase": "uid",
+        "type": "text",
+        "autoColName": "uid",
+        "manColName": "uid",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 4061,
+        "sampleVals": [
+            "9o7bad0up43983xdxeu9o7badvevme87",
+            "7h8oz9iv5rxsyl06mj4o2437h8oz9s2u",
+            "2untdp3shwvb1jm0o0b3j3s2untdppnv",
+            "zao8ltdws024x3dey1sab33zao8ltd0c",
+            "7bd0rxnkk7yviuvo3e7bd0rht3zuba6v",
+            "c62piz5fpvsz66s21a0c6249fr6bae8g",
+            "gkfrxtnvt35q7qfj8wegkfrxtcsp7u08",
+            "1bq1uhji9jcbnm6fbxs91bq1uxo7sbcd",
+            "3q0swf67a7klb2bx53q0fpon7mzka7oj",
+            "acv9upmmkgtgmqiacvcgs6vqkroymmh3"
+        ]
+    },
+    {
+        "phrase": "How are you feeling right now?",
+        "type": "text",
+        "autoColName": "feeling_how",
+        "manColName": "feeling_now",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 8,
+        "sampleVals": [
+            "I'm still ill but feeling better",
+            "I'm fine, haven't been ill",
+            "I'm fully recovered BUT not Tested",
+            "I'm beginning to feel ill",
+            "I'm now feeling quite ill",
+            "I was recovering but feeling worse again",
+            "I'm feeling very ill",
+            "I'm fully recovered AND Tested clear"
+        ]
+    },
+    {
+        "phrase": "What test did you last do that came back as clear?",
+        "type": "text",
+        "autoColName": "test_clear",
+        "manColName": "last_clear_test",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 3,
+        "sampleVals": [
+            "",
+            "Vitals were all medically cleared",
+            "Sputum / Throat swabs (PCR) - Hospital"
+        ]
+    },
+    {
+        "phrase": "What date did you do the test?",
+        "type": "date",
+        "autoColName": "date_test",
+        "manColName": "test_date",
+        "specialHandling": "day_dd_month",
+        "parentQuestion": null,
+        "numDistinct": 1,
+        "sampleVals": [
+            ""
+        ]
+    },
+    {
+        "phrase": "Do you think you have had, or still have, Coronavirus?",
+        "type": "text",
+        "autoColName": "think_do",
+        "manColName": "have_virus",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 7,
+        "sampleVals": [
+            "I'm absolutely convinced (~90%+ sure)",
+            "A small chance (~25% sure)",
+            "A decent chance (~50% sure)",
+            "No way",
+            "I'm pretty sure (~75% sure)",
+            "Yes 100%, I was tested positive",
+            ""
+        ]
+    },
+    {
+        "phrase": "A fever / high temperature",
+        "type": "boolean",
+        "autoColName": "fever_high",
+        "manColName": "fever",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "A fever / high temperature",
+            ""
+        ]
+    },
+    {
+        "phrase": "Loss of sense of taste / smell",
+        "type": "boolean",
+        "autoColName": "smell_taste",
+        "manColName": "taste_loss",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Loss of sense of taste / smell"
+        ]
+    },
+    {
+        "phrase": "A dry cough",
+        "type": "boolean",
+        "autoColName": "cough_dry",
+        "manColName": "dry_cough",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "A dry cough",
+            ""
+        ]
+    },
+    {
+        "phrase": "A cough with sputum",
+        "type": "boolean",
+        "autoColName": "sputum_cough",
+        "manColName": "cough_sputum",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "A cough with sputum"
+        ]
+    },
+    {
+        "phrase": "Really tired",
+        "type": "boolean",
+        "autoColName": "tired_really",
+        "manColName": "really_tired",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "Really tired",
+            ""
+        ]
+    },
+    {
+        "phrase": "Short of breath",
+        "type": "boolean",
+        "autoColName": "breath_short",
+        "manColName": "short_breath",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Short of breath"
+        ]
+    },
+    {
+        "phrase": "Achy joints and / or muscles",
+        "type": "boolean",
+        "autoColName": "achy_joints",
+        "manColName": "achy_joints",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "Achy joints and / or muscles",
+            ""
+        ]
+    },
+    {
+        "phrase": "A sore throat",
+        "type": "boolean",
+        "autoColName": "sore_throat",
+        "manColName": "sore_throat",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "A sore throat"
+        ]
+    },
+    {
+        "phrase": "A headache",
+        "type": "boolean",
+        "autoColName": "headache",
+        "manColName": "headache",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "A headache"
+        ]
+    },
+    {
+        "phrase": "Chills",
+        "type": "boolean",
+        "autoColName": "chills",
+        "manColName": "chills",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "Chills",
+            ""
+        ]
+    },
+    {
+        "phrase": "Vomiting / nauseous",
+        "type": "boolean",
+        "autoColName": "nauseous_vomiting",
+        "manColName": "nauseous",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "Vomiting / nauseous",
+            ""
+        ]
+    },
+    {
+        "phrase": "Congested nose",
+        "type": "boolean",
+        "autoColName": "congested_nose",
+        "manColName": "congested_nose",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Congested nose"
+        ]
+    },
+    {
+        "phrase": "Stomach disturbance / diarrhoea",
+        "type": "boolean",
+        "autoColName": "diarrhoea_stomach",
+        "manColName": "bad_stomach",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Stomach disturbance / diarrhoea"
+        ]
+    },
+    {
+        "phrase": "Other",
+        "type": "text",
+        "autoColName": "other",
+        "manColName": "other",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 47,
+        "sampleVals": [
+            "",
+            "Tight chest",
+            "Chest pressure",
+            "Sensitive skin",
+            "feeling of tightness in my lungs/heart area",
+            "Weeping eyes, sore nose",
+            "Tightened chest, pain just below lungs",
+            "Eyes red and weeping and runny nose",
+            "Weight on chest",
+            "Lung pain like running in cold"
+        ]
+    },
+    {
+        "phrase": "When do you think you may have first caught it?",
+        "type": "date",
+        "autoColName": "caught_think",
+        "manColName": "first_caught",
+        "specialHandling": "day_dd_month",
+        "parentQuestion": null,
+        "numDistinct": 69,
+        "sampleVals": [
+            "Saturday 14 March",
+            "",
+            "Monday 10 February",
+            "Wednesday 11 March",
+            "Tuesday 10 March",
+            "Friday 28 February",
+            "Wednesday 18 March",
+            "Tuesday 24 March",
+            "Monday 16 March",
+            "Thursday 12 March"
+        ]
+    },
+    {
+        "phrase": "When did you start to feel ill?",
+        "type": "date",
+        "autoColName": "ill_start",
+        "manColName": "first_ill",
+        "specialHandling": "day_dd_month",
+        "parentQuestion": null,
+        "numDistinct": 72,
+        "sampleVals": [
+            "Monday 16 March",
+            "",
+            "Friday 13 March",
+            "Saturday 14 March",
+            "Sunday 01 March",
+            "Sunday 15 March",
+            "Wednesday 18 March",
+            "Tuesday 24 March",
+            "Thursday 19 March",
+            "Wednesday 25 March"
+        ]
+    },
+    {
+        "phrase": "How long did you feel ill for?",
+        "type": "text",
+        "autoColName": "ill_feel",
+        "manColName": "how_long_ill",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 7,
+        "sampleVals": [
+            "I'm still ill!",
+            "",
+            "One to two weeks",
+            "Less than a week",
+            "On and off for a few days or less",
+            "More than two weeks",
+            "I never felt ill"
+        ]
+    },
+    {
+        "phrase": "How bad did you, or do you, feel?",
+        "type": "int",
+        "autoColName": "bad_feel",
+        "manColName": "how_bad_feel",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 12,
+        "sampleVals": [
+            "10",
+            "",
+            "6",
+            "2",
+            "5",
+            "4",
+            "3",
+            "7",
+            "8",
+            "1"
+        ]
+    },
+    {
+        "phrase": "How hard was it, or is it still, to breathe?",
+        "type": "int",
+        "autoColName": "breathe_hard",
+        "manColName": "how_hard_breathe",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 12,
+        "sampleVals": [
+            "0",
+            "",
+            "6",
+            "2",
+            "1",
+            "3",
+            "4",
+            "5",
+            "7",
+            "10"
+        ]
+    },
+    {
+        "phrase": "How anxious were you, or are you?",
+        "type": "int",
+        "autoColName": "anxious_how",
+        "manColName": "how_anxious",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 11,
+        "sampleVals": [
+            "8",
+            "7",
+            "6",
+            "5",
+            "1",
+            "2",
+            "0",
+            "4",
+            "3",
+            "9"
+        ]
+    },
+    {
+        "phrase": "How old are you?",
+        "type": "text",
+        "autoColName": "old_how",
+        "manColName": "age",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 8,
+        "sampleVals": [
+            "75-84 years old",
+            "35-44 years old",
+            "45-54 years old",
+            "55-64 years old",
+            "65-74 years old",
+            "20-34 years old",
+            "0-19 years old",
+            "85+ years old"
+        ]
+    },
+    {
+        "phrase": "Are you...",
+        "type": "text",
+        "autoColName": "you_are",
+        "manColName": "are_you",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 4,
+        "sampleVals": [
+            "Male",
+            "Female",
+            "Other",
+            "Skip"
+        ]
+    },
+    {
+        "phrase": "I am fit and well.",
+        "type": "boolean",
+        "autoColName": "fit_am",
+        "manColName": "am_fit",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "I am fit and well.",
+            ""
+        ]
+    },
+    {
+        "phrase": "I am okay but not as fit as I could be",
+        "type": "boolean",
+        "autoColName": "okay_fit",
+        "manColName": "am_ok",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "I am okay but not as fit as I could be"
+        ]
+    },
+    {
+        "phrase": "I am not very fit at all",
+        "type": "boolean",
+        "autoColName": "fit_am_very",
+        "manColName": "am_not_fit",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "I am not very fit at all"
+        ]
+    },
+    {
+        "phrase": "I smoke",
+        "type": "boolean",
+        "autoColName": "smoke",
+        "manColName": "smoke",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "I smoke"
+        ]
+    },
+    {
+        "phrase": "Heart condition",
+        "type": "boolean",
+        "autoColName": "heart_condition",
+        "manColName": "heart_condition",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "Heart condition",
+            ""
+        ]
+    },
+    {
+        "phrase": "Chronic heart problems",
+        "type": "boolean",
+        "autoColName": "chronic_heart",
+        "manColName": "chronic_heart",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Chronic heart problems"
+        ]
+    },
+    {
+        "phrase": "High blood pressure but not treated",
+        "type": "boolean",
+        "autoColName": "treated_blood",
+        "manColName": "untreated_high_blood",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "High blood pressure but not treated"
+        ]
+    },
+    {
+        "phrase": "High blood pressure chronically",
+        "type": "boolean",
+        "autoColName": "chronically_blood",
+        "manColName": "chronic_high_blood",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "High blood pressure chronically"
+        ]
+    },
+    {
+        "phrase": "Mild lung problem like mild Asthma",
+        "type": "boolean",
+        "autoColName": "asthma_mild",
+        "manColName": "mild_asthma",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Mild lung problem like mild Asthma"
+        ]
+    },
+    {
+        "phrase": "Chronic lung problems",
+        "type": "boolean",
+        "autoColName": "lung_chronic",
+        "manColName": "chronic_lung",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Chronic lung problems"
+        ]
+    },
+    {
+        "phrase": "Mild or borderline Diabetes",
+        "type": "boolean",
+        "autoColName": "diabetes_mild",
+        "manColName": "mild_diabetes",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Mild or borderline Diabetes"
+        ]
+    },
+    {
+        "phrase": "Chronic Diabetes",
+        "type": "boolean",
+        "autoColName": "diabetes_chronic",
+        "manColName": "chronic_diabetes",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Chronic Diabetes"
+        ]
+    },
+    {
+        "phrase": "Current Cancer treatment with chemo",
+        "type": "boolean",
+        "autoColName": "chemo_cancer",
+        "manColName": "cancer_chemo",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Current Cancer treatment with chemo"
+        ]
+    },
+    {
+        "phrase": "Past Cancer treatment with chemo",
+        "type": "boolean",
+        "autoColName": "chemo_cancer_past",
+        "manColName": "past_cancer_chemo",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "Past Cancer treatment with chemo"
+        ]
+    },
+    {
+        "phrase": "I am pregnant",
+        "type": "boolean",
+        "autoColName": "pregnant_am",
+        "manColName": "pregnant",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "I am pregnant"
+        ]
+    },
+    {
+        "phrase": "I'm always told to get the flu jab",
+        "type": "boolean",
+        "autoColName": "im_jab",
+        "manColName": "jab_informed",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "I'm always told to get the flu jab",
+            ""
+        ]
+    },
+    {
+        "phrase": "I got the flu jab this year",
+        "type": "boolean",
+        "autoColName": "jab_flu",
+        "manColName": "got_jab",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "I got the flu jab this year",
+            ""
+        ]
+    },
+    {
+        "phrase": "I missed the flu jab this year",
+        "type": "boolean",
+        "autoColName": "jab_flu_missed",
+        "manColName": "missed_jab",
+        "specialHandling": "symptom",
+        "parentQuestion": null,
+        "numDistinct": 2,
+        "sampleVals": [
+            "",
+            "I missed the flu jab this year"
+        ]
+    },
+    {
+        "phrase": "Have any others you live with fallen ill with suspected Coronavirus?",
+        "type": "text",
+        "autoColName": "ill_fallen",
+        "manColName": "others_have_virus",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 4,
+        "sampleVals": [
+            "No",
+            "Yes, but not everyone",
+            "Yes, everyone",
+            ""
+        ]
+    },
+    {
+        "phrase": "When did the first person who you live with fall ill?",
+        "type": "date",
+        "autoColName": "ill_fall",
+        "manColName": "when_other_ill",
+        "specialHandling": "day_dd_month",
+        "parentQuestion": null,
+        "numDistinct": 46,
+        "sampleVals": [
+            "",
+            "Friday 06 March",
+            "Monday 16 March",
+            "Tuesday 17 March",
+            "Saturday 21 March",
+            "Sunday 15 March",
+            "Sunday 22 March",
+            "Friday 20 March",
+            "Thursday 19 March",
+            "Friday 14 February"
+        ]
+    },
+    {
+        "phrase": "How many people who you live with fell ill?",
+        "type": "int",
+        "autoColName": "ill_fell",
+        "manColName": "how_many_ill",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 8,
+        "sampleVals": [
+            "",
+            "1",
+            "2",
+            "3",
+            "4",
+            "6",
+            "0",
+            "5"
+        ]
+    },
+    {
+        "phrase": "How many people do you live with?",
+        "type": "int",
+        "autoColName": "live_how",
+        "manColName": "live_with",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 14,
+        "sampleVals": [
+            "1",
+            "3",
+            "2",
+            "5",
+            "4",
+            "6",
+            "0",
+            "7",
+            "8",
+            "10"
+        ]
+    },
+    {
+        "phrase": "Which country are you in?",
+        "type": "text",
+        "autoColName": "country_you",
+        "manColName": "country",
+        "specialHandling": "countryIndex",
+        "parentQuestion": null,
+        "numDistinct": 48,
+        "sampleVals": [
+            "United Kingdom",
+            "United States",
+            "Germany",
+            "Ireland",
+            "Australia",
+            "France",
+            "United Arab Emirates",
+            "Spain",
+            "Portugal",
+            "Algeria"
+        ]
+    },
+    {
+        "phrase": "Please enter as much of your postcode as you wish to share or zip-code ",
+        "type": "text",
+        "autoColName": "postcode_zipcode",
+        "manColName": "post",
+        "specialHandling": "postIndex",
+        "parentQuestion": null,
+        "numDistinct": 2592,
+        "sampleVals": [
+            "Ex215",
+            "EX201",
+            "32312",
+            "W9",
+            "TW2 5rz",
+            "Sm2",
+            "N87LP",
+            "Tq6 9aa",
+            "90403",
+            "SL0"
+        ]
+    },
+    {
+        "phrase": "Would you be interested in knowing about any tests that can help confirm whether you have had Coronavirus, and if you may be immune to the disease?",
+        "type": "text",
+        "autoColName": "immune_confirm",
+        "manColName": "test_interest",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 3,
+        "sampleVals": [
+            "Interested, send me more info when you hear about it",
+            "No, not interested",
+            "Interested, but no info please"
+        ]
+    },
+    {
+        "phrase": "Please type your e-mail address",
+        "type": "text",
+        "autoColName": "email_please",
+        "manColName": "email",
+        "specialHandling": "merge_email",
+        "parentQuestion": null,
+        "numDistinct": 1,
+        "sampleVals": [
+            ""
+        ]
+    },
+    {
+        "phrase": "Start Date (UTC)",
+        "type": "timestamp without time zone",
+        "autoColName": "date_start",
+        "manColName": "start_date",
+        "specialHandling": "dd-mm-yyyy",
+        "parentQuestion": null,
+        "numDistinct": 2500,
+        "sampleVals": [
+            "27/03/2020 08:05",
+            "27/03/2020 08:00",
+            "27/03/2020 06:12",
+            "27/03/2020 05:28",
+            "27/03/2020 02:26",
+            "27/03/2020 00:51",
+            "26/03/2020 23:33",
+            "26/03/2020 23:18",
+            "26/03/2020 23:01",
+            "26/03/2020 22:44"
+        ]
+    },
+    {
+        "phrase": "Submit Date (UTC)",
+        "type": "timestamp without time zone",
+        "autoColName": "submit_date",
+        "manColName": "submit_date",
+        "specialHandling": "dd-mm-yyyy",
+        "parentQuestion": null,
+        "numDistinct": 2541,
+        "sampleVals": [
+            "27/03/2020 08:09",
+            "27/03/2020 08:03",
+            "27/03/2020 06:17",
+            "27/03/2020 05:35",
+            "27/03/2020 02:31",
+            "27/03/2020 00:53",
+            "26/03/2020 23:36",
+            "26/03/2020 23:20",
+            "26/03/2020 23:03",
+            "26/03/2020 22:46"
+        ]
+    },
+    {
+        "phrase": "Network ID",
+        "type": "text",
+        "autoColName": "id_network",
+        "manColName": "network_id",
+        "specialHandling": null,
+        "parentQuestion": null,
+        "numDistinct": 3743,
+        "sampleVals": [
+            "ababdac3d9",
+            "c1e5594c8e",
+            "04b3b248c4",
+            "669265807d",
+            "7076c39ff8",
+            "95604e4cbc",
+            "2272244814",
+            "c886ca0081",
+            "08ed2fa3f1",
+            "7007651721"
+        ]
+    }
+]
