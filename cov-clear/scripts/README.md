@@ -4,28 +4,33 @@
 
 Takes as input the csv file provided by cov-clear and generates
 a file called 'sql.txt' which is a list of sql commands. The
-commands create and populate two tables, a 'questions' table and
-a 'survey' table. 
+commands create and populate three tables, a 'survey' table, a
+'symptoms' table, and a 'questions' table. 
 
-The 'survey' table contains all of the survey results.
+### Inputs
 
-The 'questions' table simply maps the column names of the 'survey'
-table to the original survey questions.
+* `colInfo.json`: the configuration. `colInfo.json` assigns short
+column names to survey questions. It also indicates when special
+handling of data is required.
+* `<originalData>.csv`: The csv file from cov-clear.
+
+### Outputs
+
+* `sql.txt`: The sql commands needed to populate all three tables.
+* `colDifferences.json`: If `<originalData>.csv` doesn't match the configuration in `colInfo.json`, then `colDifferences.json` is produced and the program aborts.
+* `characterize.json`: This is formatted like `colInfo.json`, but lists up to 10 distinct column values for each column. This is produces by setting the `justCharacterize` flag to `True` in the `getColInfo` class object creation call. Can contain sensitive information.
 
 ### Features
 
-makeSqlFromCsv.py does the following:
-
-* Automatically chooses short column names (the column names in the original csv file are the actual questions).
-* Automatically detects column type (text, real, int, date, timestamp)
 * Converts 'Day dd Month' to postgres date
 * Converts 'dd/mm/yyyy hh:mm' to postgres timestamp
 * Puts postcodes in upper case and removes spaces
+* Populates the symptoms table with columns labeled `"specialHandling":"symptom"`
+* Uses the postal code and country name to generate three new columns: `country_code`, `lat`, and `long`.
 
 ### Limitations
 
 * Currently 'Day dd Month' strings are assumed to be 2020
-* Automatically choosing column names probably a bad idea, because a small change in the question might lead to a new column name
 
 ## postalLatLong.py
 
@@ -59,3 +64,8 @@ Exposes the following API:
   * Searches for best match (longest zip code prefix)
   * Selects randomly if multiple lat/long matches
 
+## Other Files
+
+* `colInfo.json`: Config for `makeSqlFromCsv.py`
+* `countryCodes.json`: Used by `postalLatLong.py`
+* `cov_clear.json`: This is the Aircloak Insights cloak configuration file

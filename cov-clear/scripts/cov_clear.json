@@ -1,0 +1,34 @@
+{
+    "driver": "postgresql",
+    "max_rare_negative_conditions": 0,
+    "name": "cov_clear",
+    "concurrency": 2,
+    "parameters": {
+        "hostname": "vrt-20-0101.mpi-sws.org",
+        "username": "cov_clear",
+        "database": "cov_clear",
+        "password": "7IXF5RdNu3aBemTfdCsUVY9Lg6jjXsj4"
+    },
+    "tables": {
+        "survey": {
+            "db_name": "survey",
+            "keys": [
+                {
+                    "user_id": "uid"
+                }
+            ]
+        },
+        "symptoms": {
+            "db_name": "symptoms",
+            "keys": [
+                {
+                    "user_id": "uid"
+                }
+            ]
+        },
+        "questions": {
+            "db_name": "questions",
+            "content_type": "non-personal"
+        }
+    }
+}
