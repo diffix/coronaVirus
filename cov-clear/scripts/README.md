@@ -19,6 +19,7 @@ handling of data is required.
 * `sql.txt`: The sql commands needed to populate all three tables.
 * `colDifferences.json`: If `<originalData>.csv` doesn't match the configuration in `colInfo.json`, then `colDifferences.json` is produced and the program aborts.
 * `characterize.json`: This is formatted like `colInfo.json`, but lists up to 10 distinct column values for each column. This is produces by setting the `justCharacterize` flag to `True` in the `getColInfo` class object creation call. Can contain sensitive information.
+* `colsAndQuestions.csv`: The column names and questions, sorted by column name
 
 ### Features
 
@@ -64,8 +65,19 @@ Exposes the following API:
   * Searches for best match (longest zip code prefix)
   * Selects randomly if multiple lat/long matches
 
+## makeQuestionsCsv.py
+
+Produces `colsAndQuestions.csv`, which contains the column names and
+associated questions, sorted alphabetically by column name.
+
+### To run
+
+Can be run standalone (`python makeQuestionsCsv.py`)
+Is called by makeSqlFromCsv.py
+
 ## Other Files
 
 * `colInfo.json`: Config for `makeSqlFromCsv.py`
 * `countryCodes.json`: Used by `postalLatLong.py`
 * `cov_clear.json`: This is the Aircloak Insights cloak configuration file
+* `colsAndQuestions.csv`: column names and questions, sorted by column name

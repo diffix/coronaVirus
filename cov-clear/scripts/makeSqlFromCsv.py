@@ -3,6 +3,7 @@ from nltk.corpus import brown
 from nltk.probability import ConditionalFreqDist
 from nltk.tokenize import word_tokenize
 from postalLatLong import postalLatLong
+from makeQuestionsCsv import colsQuestions
 import random
 import re
 import csv
@@ -32,6 +33,7 @@ handling of data is required.
 * `sql.txt`: The sql commands needed to populate all three tables.
 * `colDifferences.json`: If `<originalData>.csv` doesn't match the configuration in `colInfo.json`, then `colDifferences.json` is produced and the program aborts.
 * `characterize.json`: This is formatted like `colInfo.json`, but lists up to 10 distinct column values for each column. This is produces by setting the `justCharacterize` flag to `True` in the `getColInfo` class object creation call. Can contain sensitive information.
+* `colsAndQuestions.csv`: The column names and questions, sorted by column name
 
 ### Features
 
@@ -103,6 +105,8 @@ class getColInfo:
         else:
             print(f"Couldn't find file {colInfoFile}....abort")
             quit()
+        # Generate the columns/questions csv file
+        colsQuestions(self.colInfo)
         # Get any new column info
         self.colInfoNew = self._getColInfo(firstLine,allLines)
         (differences,characterize) = self._characterize()
