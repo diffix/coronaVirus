@@ -1,0 +1,224 @@
+<!--suppress ALL -->
+<html>
+<head>
+    <title>Location Data visualization</title>
+    <style>
+        /* Set the size of the div element that contains the map */
+        #map {
+            height: 95%; /* The height is the height of the page */
+            width: 100%; /* The width is the width of the web page */
+        }
+        select {
+            height: 5%;
+            width: 200px;
+        }
+        .pac-card {
+        margin: 10px 10px 0 0;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        background-color: #fff;
+        font-family: Roboto;
+      }
+
+      #pac-container {
+        padding-bottom: 12px;
+        margin-right: 12px;
+      }
+
+      .pac-controls {
+        display: inline-block;
+        padding: 5px 11px;
+      }
+
+      .pac-controls label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 6px 11px;
+        text-overflow: ellipsis;
+        width: 400px;
+          left: 0 !important;
+          margin-top: 64px;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+
+      #title {
+        color: #fff;
+        background-color: #4d90fe;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 6px 12px;
+      }
+      #target {
+        width: 345px;
+      }
+    </style>
+</head>
+<body>
+<select onchange="updateMap(this)">
+    <option>select an option</option>
+    <option>home</option>
+    <option>office</option>
+    <option>super</option>
+    <option>store</option>
+    <option>school</option>
+    <option>sport</option>
+    <option>restaurant</option>
+    <option>other</option>
+</select>
+<label id="count" style="width:200px;"></label>
+<!--The div element for the map -->
+<div id="forSearch"></div>
+<div id="map"></div>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"
+        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script>
+    var json = null;
+    $.get('/locationData',  // url
+        function (data, textStatus, jqXHR) {  // success callback
+            console.log('status: ' + textStatus);
+            window.json = data;
+            // initMap(json)
+    });
+
+
+    // Initialize and add the map
+    function initMap(locations) {
+        $("#forSearch").append($(`<input id="pac-input" class="controls" type="text" placeholder="Search Box">`));
+        // The location of Uluru
+        var kl = {lat: 49.4340879, lng: 7.7408272};
+        // The map, centered at kl
+        var map = new google.maps.Map(
+            document.getElementById('map'), {zoom: 13, center: kl});
+        // The marker, positioned at kl
+        // Create the search box and link it to the UI element.
+        var input = document.getElementById('pac-input');
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener('bounds_changed', function() {
+          searchBox.setBounds(map.getBounds());
+        });
+        var markers = [];
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+        searchBox.addListener('places_changed', function() {
+          var places = searchBox.getPlaces();
+
+          if (places.length == 0) {
+            return;
+          }
+
+          // Clear out the old markers.
+          markers.forEach(function(marker) {
+            marker.setMap(null);
+          });
+          markers = [];
+
+          // For each place, get the icon, name and location.
+          var bounds = new google.maps.LatLngBounds();
+          places.forEach(function(place) {
+            if (!place.geometry) {
+              console.log("Returned place contains no geometry");
+              return;
+            }
+            var icon = {
+              url: place.icon,
+              size: new google.maps.Size(71, 71),
+              origin: new google.maps.Point(0, 0),
+              anchor: new google.maps.Point(17, 34),
+              scaledSize: new google.maps.Size(25, 25)
+            };
+
+            // Create a marker for each place.
+            markers.push(new google.maps.Marker({
+              map: map,
+              icon: icon,
+              title: place.name,
+              position: place.geometry.location
+            }));
+            if (place.geometry.viewport) {
+              // Only geocodes have viewport.
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          map.fitBounds(bounds);
+        });
+
+        var infowindow = new google.maps.InfoWindow({
+            content: ''
+        });
+
+        google.maps.event.addListener(map, 'click', (function (infowindow) {
+            return function () {
+                infowindow.close();
+            };
+        })(infowindow));
+
+        for (var i = 0; i < locations.length; i++) {
+            var marker = new google.maps.Marker(
+                {
+                    position: {
+                        lat: parseFloat(locations[i]['lat']),
+                        lng: parseFloat(locations[i]['lon'])
+                    },
+                    map: map,
+                });
+            var infoContent = "";
+            for (var k in locations[i]) {
+                infoContent += "<p><b>"+k+":</b> "+locations[i][k]+"</p>";
+            }
+            google.maps.event.addListener(marker, 'click', (function (marker, content, infowindow) {
+                return function () {
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+                };
+            })(marker, infoContent, infowindow));
+        }
+    }
+
+    function hello() {
+        console.log('map loaded')
+        initMap([]);
+    }
+
+    function updateMap(elm) {
+        val = $(elm).find("option:selected").text();
+        if (val !== "select an option") {
+            $("#count").text("count: "+window.json[val].length)
+            initMap(window.json[val]);
+        }
+        else{
+            $("#count").text("")
+            initMap([]);
+        }
+    }
+
+</script>
+<!--Load the API from the specified URL
+* The async attribute allows the browser to render the page while the API loads
+* The key parameter will contain your own API key (which is not needed for this tutorial)
+* The callback parameter executes the initMap() function
+-->
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrUX3jzZNPB-sJIwMGgH0oI-wh3C9Atb8&libraries=places&callback=hello">
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang='en-US'>
+<head>
+    <meta charset='utf-8'/>
+
+    <link rel="icon" type="image/png"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/favicon-32x32.png?ver=1.7.0"/>
+    <link rel="icon" type="image/png" sizes="192x192"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/android-icon-192x192.png?ver=1.7.0"/>
+    <link rel="icon" type="image/png" sizes="32x32"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/favicon-32x32.png?ver=1.7.0"/>
+    <link rel="icon" type="image/png" sizes="96x96"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/favicon-96x96.png?ver=1.7.0"/>
+    <link rel="icon" type="image/png" sizes="16x16"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/favicon-16x16.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="57x57"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-57x57.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="60x60"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-60x60.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="72x72"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-72x72.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="76x76"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-76x76.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="114x114"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-114x114.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="120x120"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-120x120.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="144x144"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-144x144.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="152x152"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-152x152.png?ver=1.7.0"/>
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="https://www.mpi-sws.org/wp-content/themes/mpi-sws/assets/images/favicon/apple-icon-180x180.png?ver=1.7.0"/>
+
+    <title>Loading ...</title>
+
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'/>
+    <script type="text/javascript" src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+    <link rel='stylesheet' type="text/css" href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css'/>
+    <link rel="stylesheet" type="text/css" href="heatmap_conf.css"/>
+</head>
+<body>
+<div id='map'></div>
+<div class="map-overlay-top">
+    <div class="map-overlay-inner">
+        <h2 id="title">Loading ...</h2>
+        <h3 id="subtitle">Loading ...</h3>
+        <p>
+            <label id="dataSet" for="dsSlider">Loading ...</label>
+            <input class="slider" id="dsSlider" type="range" min="0" max="7" step="1" value="0"/>
+        </p>
+        <p>
+            <label id="date" for="dSlider">Loading ...</label>
+            <input class="slider" id="dSlider" type="range" min="0" max="7" step="1" value="0"/>
+            <label id="time" for="tSlider">Loading ...</label>
+            <input class="slider" id="tSlider" type="range" min="0" max="23" step="1" value="0"/>
+        </p>
+        <p>
+            <label id="animationSpeed" for="asSlider">Animation step every: 0.5s</label>
+            <input class="slider" id="asSlider" type="range" min="1" max="11" step="1" value="1"/>
+            <button id="animationButton" type="button">Start Animation</button>
+        </p>
+        <p>
+            <input class="check" id="shCheck" type="checkbox" checked/>
+            <label id="showHeatmap" for="shCheck">Show heatmap</label><br>
+            <input class="check" id="srdCheck" type="checkbox" checked/>
+            <label id="showRawData" for="srdCheck">Show raw data</label>
+        </p>
+    </div>
+</div>
+<div class="map-overlay-bottom">
+    <a href="https://imprint.mpi-klsb.mpg.de/sws/people/cmickler">Imprint</a> / <a
+        href="https://data-protection.mpi-klsb.mpg.de/sws/people/cmickler">Data Protection</a>
+</div>
+<script type="text/javascript" src="heatmap_conf.js"></script>
+</body>
+</html>
