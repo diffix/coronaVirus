@@ -1,37 +1,38 @@
-from cloakConfig import CloakConfig
-from sql_adapter import SQLAdapter
-
+# from sql_adapter import SQLAdapter
+import datetime
 
 class MapBoxCloakAccess:
     def __init__(self):
-        self._sqlAdapter = SQLAdapter(CloakConfig.parameters)
+        # self._sqlAdapter = SQLAdapter(CloakConfig.parameters)
+        pass
 
     def queryEncounterBuckets(self, latRange, lonRange, timeRange=None):
-        sql = f"SELECT BUCKET(lat BY {latRange} ALIGN MIDDLE), BUCKET(lon BY {lonRange} ALIGN MIDDLE), "
-        groupBy = "1,2"
-        if timeRange is not None:
-            allowed = {'year', 'quarter', 'month', 'day', 'hour', 'minute', 'second'}
-            if timeRange not in allowed:
-                raise ValueError(f"timeRange {timeRange} must be one of {allowed}")
-            sql += f"DATE_TRUNC('{timeRange}', time), "
-            groupBy += ",3"
-        sql += f"COUNT(*) FROM encounters GROUP BY {groupBy};"
-        result = self._sqlAdapter.queryCloak(sql)
+        # sql = f"SELECT BUCKET(lat BY {latRange} ALIGN MIDDLE), BUCKET(lon BY {lonRange} ALIGN MIDDLE), "
+        # groupBy = "1,2"
+        # if timeRange is not None:
+        #     allowed = {'year', 'quarter', 'month', 'day', 'hour', 'minute', 'second'}
+        #     if timeRange not in allowed:
+        #         raise ValueError(f"timeRange {timeRange} must be one of {allowed}")
+        #     sql += f"DATE_TRUNC('{timeRange}', time), "
+        #     groupBy += ",3"
+        # sql += f"COUNT(*) FROM encounters GROUP BY {groupBy};"
+        # result = self._sqlAdapter.queryCloak(sql)
         buckets = []
         filtered = 0
-        for row in result:
-            lat = row[0]
-            lon = row[1]
-            time = None
-            if 3 < len(row):
-                time = row[2]
-            if lat is None or lon is None or (3 < len(row) and time is None):
-                filtered += 1
-                continue
-            buckets.append(MapBoxBucket(lat, lon, time=time, count=row[len(row) - 1]))
-        print(f"Loaded {len(result)} buckets from cloak.")
-        print(f"Filtered {filtered} buckets due to */NULL values.")
-        self._sqlAdapter.disconnect()
+        # for row in result:
+        #     lat = row[0]
+        #     lon = row[1]
+        #     time = None
+        #     if 3 < len(row):
+        #         time = row[2]
+        #     if lat is None or lon is None or (3 < len(row) and time is None):
+        #         filtered += 1
+        #         continue
+        # buckets.append(MapBoxBucket(lat, lon, time=time, count=row[len(row) - 1]))
+        buckets.append(MapBoxBucket(0.1, 0.2, time=datetime.datetime.fromtimestamp(0), count=1234))
+        # print(f"Loaded {len(result)} buckets from cloak.")
+        # print(f"Filtered {filtered} buckets due to */NULL values.")
+        # self._sqlAdapter.disconnect()
         return buckets
 
 
