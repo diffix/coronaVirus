@@ -67,7 +67,8 @@ cloak = MapBoxCloakAccess()
 
 confLst = list()
 for geoWidth in [0.002, 0.001, 0.0005, 0.0002]:
-    buckets = cloak.queryEncounterBuckets(geoWidth, geoWidth, 'hour')
+    # buckets = cloak.queryEncounterBuckets(geoWidth, geoWidth, 'hour')
+    buckets = cloak.queryEncounterBuckets(geoWidth, geoWidth)
     confLst.append(MapBoxCreator.createMap(f"encounters-{geoWidth}", f"Lat/Lng width: {geoWidth}", buckets, geoWidth,
                                            geoWidth))
 conf = MapBoxCreator.createMergedMap('encounters', title, confLst)
