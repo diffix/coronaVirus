@@ -38,40 +38,61 @@
     <script type="text/javascript" src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
     <link rel='stylesheet' type="text/css" href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css'/>
     <link rel="stylesheet" type="text/css" href="heatmap_conf.css"/>
+    <script type="text/javascript" src="remus.js"></script>
 </head>
 <body>
-<div id='map'></div>
+<link rel="stylesheet" href="remus.min.css">
+
+
+
+<div class="remus">
+	<div class="remus-element" id='map'>
+	</div>
+	<div class="remus-element">
+		<img src="sample.jpg" alt="2">
+	</div>
+</div>
+
 <div class="map-overlay-top">
-    <div class="map-overlay-inner">
-        <h2 id="title">Loading ...</h2>
-        <h3 id="subtitle">Loading ...</h3>
-        <p>
-            <label id="dataSet" for="dsSlider">Loading ...</label>
-            <input class="slider" id="dsSlider" type="range" min="0" max="7" step="1" value="0"/>
-        </p>
-        <p>
-            <label id="date" for="dSlider">Loading ...</label>
-            <input class="slider" id="dSlider" type="range" min="0" max="7" step="1" value="0"/>
-            <label id="time" for="tSlider">Loading ...</label>
-            <input class="slider" id="tSlider" type="range" min="0" max="23" step="1" value="0"/>
-        </p>
-        <p>
-            <label id="animationSpeed" for="asSlider">Animation step every: 0.5s</label>
-            <input class="slider" id="asSlider" type="range" min="1" max="11" step="1" value="1"/>
-            <button id="animationButton" type="button">Start Animation</button>
-        </p>
-        <p>
-            <input class="check" id="shCheck" type="checkbox" checked/>
-            <label id="showHeatmap" for="shCheck">Show heatmap</label><br>
-            <input class="check" id="srdCheck" type="checkbox" checked/>
-            <label id="showRawData" for="srdCheck">Show raw data</label>
-        </p>
-    </div>
+      <div class="map-overlay-inner">
+          <h2 id="title">Loading ...</h2>
+          <h3 id="subtitle">Loading ...</h3>
+          <p>
+              <label id="dataSet" for="dsSlider">Loading ...</label>
+              <input class="slider" id="dsSlider" type="range" min="0" max="7" step="1" value="0"/>
+          </p>
+          <p>
+              <label id="date" for="dSlider">Loading ...</label>
+              <input class="slider" id="dSlider" type="range" min="0" max="7" step="1" value="0"/>
+              <label id="time" for="tSlider">Loading ...</label>
+              <input class="slider" id="tSlider" type="range" min="0" max="23" step="1" value="0"/>
+          </p>
+          <p>
+              <label id="animationSpeed" for="asSlider">Animation step every: 0.5s</label>
+              <input class="slider" id="asSlider" type="range" min="1" max="11" step="1" value="1"/>
+              <button id="animationButton" type="button">Start Animation</button>
+          </p>
+          <p>
+              <input class="check" id="shCheck" type="checkbox" checked/>
+              <label id="showHeatmap" for="shCheck">Show heatmap</label><br>
+              <input class="check" id="srdCheck" type="checkbox" checked/>
+              <label id="showRawData" for="srdCheck">Show raw data</label>
+          </p>
+      </div>
 </div>
 <div class="map-overlay-bottom">
-    <a href="https://imprint.mpi-klsb.mpg.de/sws/people/cmickler">Imprint</a> / <a
-        href="https://data-protection.mpi-klsb.mpg.de/sws/people/cmickler">Data Protection</a>
+<a href="https://imprint.mpi-klsb.mpg.de/sws/people/cmickler">Imprint</a> / <a
+      href="https://data-protection.mpi-klsb.mpg.de/sws/people/cmickler">Data Protection</a>
 </div>
+<!-- <script src="remus.min.js"></script> -->
+<script type="module">
+      // import {Remus} from './remus.min.js';
+      var remus = new Remus({
+            element: '.remus', // selector for main Remus container
+            height: 500 // height value in pixels if you want it to be fixed - optional
+      });
+</script>
+
 <script type="text/javascript" src="heatmap_conf.js"></script>
 </body>
 </html>
