@@ -9,6 +9,8 @@ class MapBoxCloakAccess:
         self._sqlAdapter = SQLAdapter(CloakConfig.parameters)
 
     def queryEncounterBuckets(self, latRange, lonRange, timeRange=None, raw=False):
+        # FIXME a bit silly, find the correct formula
+        rangeArea = latRange * lonRange
         sql = f"SELECT diffix.round_by(pickup_latitude, {latRange}) as lat, diffix.round_by(pickup_longitude, {lonRange}) as lon, "
         groupBy = "1,2"
         if timeRange is not None:
@@ -35,7 +37,13 @@ class MapBoxCloakAccess:
             if lat is None or lon is None or (3 < len(row) and time is None):
                 filtered += 1
                 continue
-            buckets.append(MapBoxBucket(lat, lon, time=time, count=row[len(row) - 1]))
+            buckets.append(MapBoxBucket(
+                lat,
+                lon,
+                time=time,
+                count=row[len(row) - 1],
+                density=row[len(row) - 1] / rangeArea / 250000
+            ))
         print(f"Loaded {len(result)} buckets from cloak.")
         print(f"Filtered {filtered} buckets due to */NULL values.")
         self._sqlAdapter.disconnect()
@@ -43,11 +51,12 @@ class MapBoxCloakAccess:
 
 
 class MapBoxBucket:
-    def __init__(self, lat, lon, time=None, count=-1):
+    def __init__(self, lat, lon, time=None, count=-1, density=-1):
         self.lat = lat
         self.lon = lon
         self.time = time
         self.count = count
+        self.density = density
 
     def __str__(self):
         return f"MapBoxEncounters: {self.listOfStrings()}"
@@ -55,4 +64,4 @@ class MapBoxBucket:
     __repr__ = __str__
 
     def listOfStrings(self):
-        return [f"{v}" for v in [self.lat, self.lon, self.time, self.count] if v is not None]
+        return [f"{v}" for v in [self.lat, self.lon, self.time, self.count, self.density] if v is not None]

@@ -283,7 +283,7 @@ function addDataSet(mapElement, dataSetConf) {
                 0, 1,
                 22, Math.round(10000000 * geoWidth)
             ],
-            'heatmap-weight': ['get', 'encounters'],
+            'heatmap-weight': ['get', 'encounters_density'],
             'heatmap-intensity': 0.01
         }
     }, 'waterway-label');

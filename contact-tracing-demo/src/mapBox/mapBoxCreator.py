@@ -94,6 +94,7 @@ class MapBoxCreator:
             'title': title,
             'accessToken': MapBoxConfig.parameters['accessToken'],
             'startSeconds': startSeconds,
+            # FIXME handle moving the raw dataset to rawDataSets
             'dataSets': localConfLst,
         }
         confPath = os.path.join(mapBoxPath, 'conf')
