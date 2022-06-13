@@ -68,6 +68,9 @@ function filterBy(seconds) {
         map.setFilter(dataSetConf.name + '-heatmap', filters);
         map.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
         map.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
+        map2.setFilter(dataSetConf.name + '-heatmap', filters);
+        map2.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
+        map2.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
     }
     let date = new Date(seconds * 1000)
     document.getElementById('date').textContent = 'Date: ' + date.toLocaleDateString();
@@ -83,6 +86,9 @@ function updateDataSet() {
             map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
             map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
             map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
+            map2.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
+            map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
+            map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
         }
         currentDataSet = index;
         if (conf.dataSets.length - 1 < index) {
@@ -94,15 +100,21 @@ function updateDataSet() {
     dataSetConf = conf.dataSets[index];
     if (document.getElementById('shCheck').checked) {
         map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+        map2.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
     } else {
         map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
+        map2.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
     }
     if (document.getElementById('srdCheck').checked) {
         map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
         map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
+        map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
+        map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
     } else {
         map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
         map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
+        map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
+        map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
     }
     document.getElementById('subtitle').textContent = dataSetConf.subtitle;
     document.getElementById('dataSet').textContent = "Dataset: " + dataSetConf.name;
@@ -174,26 +186,89 @@ function initializePage(parsed) {
                 updateDataSet();
             });
     });
+    map2 = new mapboxgl.Map({
+        container: 'map2',
+        style: 'mapbox://styles/mapbox/outdoors-v11',
+        center: [-73.935242, 40.730610],
+        zoom: 13
+    });
+    map2.on('load', function () {
+        prepareMap();
+        filterBy(startSeconds);
+        dsCount = 1 < conf.dataSets.length ? conf.dataSets.length - 1 : 1;
+        document.getElementById('dsSlider').max = dsCount;
+        if (initialDataSet < 0 || conf.dataSets.length - 1 < initialDataSet) {
+            console.log("Only " + conf.dataSets.length + " datasets configured. No dataset with index " +
+                initialDataSet + " present. Displaying dataset with index 0.")
+            document.getElementById('dsSlider').value = 0;
+        } else {
+            document.getElementById('dsSlider').value = initialDataSet;
+        }
+        updateDataSet();
+        document.title = conf.title;
+        document.getElementById('title').textContent = conf.title;
+        document
+            .getElementById('dsSlider')
+            .addEventListener('input', function () {
+                updateDataSet();
+            });
+        document
+            .getElementById('tSlider')
+            .addEventListener('input', function () {
+                updateFilter();
+            });
+        document
+            .getElementById('dSlider')
+            .addEventListener('input', function () {
+                updateFilter();
+            });
+        document
+            .getElementById('asSlider')
+            .addEventListener('input', function (e) {
+                let asChoice = parseInt(e.target.value, 10) - 1;
+                if (asChoice === 0) {
+                    asChoice = 0.5;
+                }
+                document.getElementById('animationSpeed').textContent = "Animation step every: " + asChoice + "s"
+                updateAnimation();
+            });
+        document
+            .getElementById('animationButton')
+            .addEventListener('click', function () {
+                toggleAnimation();
+            });
+        document
+            .getElementById('shCheck')
+            .addEventListener('change', function (e) {
+                updateDataSet();
+            });
+        document
+            .getElementById('srdCheck')
+            .addEventListener('change', function (e) {
+                updateDataSet();
+            });
+    });
 }
 
 function prepareMap() {
     for (dataSetConf of conf.dataSets) {
-        addDataSet(dataSetConf)
+        addDataSet(map, dataSetConf)
+        addDataSet(map2, dataSetConf)
     }
 }
 
-function addDataSet(dataSetConf) {
+function addDataSet(mapElement, dataSetConf) {
     const geoWidth = parseFloat(dataSetConf.geoWidth);
     const zoomOffset = Math.log2(geoWidth / 0.0001).toFixed(1);
-    map.addSource(dataSetConf.name + '-polygons', {
+    mapElement.addSource(dataSetConf.name + '-polygons', {
         type: 'geojson',
         data: dataSetConf.polygonsFileRelativePath
     });
-    map.addSource(dataSetConf.name + '-centers', {
+    mapElement.addSource(dataSetConf.name + '-centers', {
         type: 'geojson',
         data: dataSetConf.centersFileRelativePath
     });
-    map.addLayer({
+    mapElement.addLayer({
         id: dataSetConf.name + '-heatmap',
         type: 'heatmap',
         source: dataSetConf.name + '-centers',
@@ -233,7 +308,7 @@ function addDataSet(dataSetConf) {
             'heatmap-intensity': 0.01
         }
     }, 'waterway-label');
-    map.addLayer({
+    mapElement.addLayer({
         id: dataSetConf.name + '-cloakDataRectangles',
         type: 'fill',
         source: dataSetConf.name + '-polygons',
@@ -253,7 +328,7 @@ function addDataSet(dataSetConf) {
             'fill-outline-color': 'rgb(0,0,0)'
         }
     }, 'waterway-label');
-    map.addLayer({
+    mapElement.addLayer({
         id: dataSetConf.name + '-cloakDataCounts',
         type: 'symbol',
         source: dataSetConf.name + '-centers',
@@ -291,6 +366,7 @@ if (!urlParams.has('conf')) {
     throw new Error("URL parameters do not contain 'conf'!");
 }
 let map = null
+let map2 = null
 let conf = null;
 let timer = null;
 let startSeconds = null;

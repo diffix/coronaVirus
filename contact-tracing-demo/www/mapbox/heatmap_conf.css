@@ -10,6 +10,13 @@ body {
     width: 100%;
 }
 
+#map2 {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+
 .map-overlay-top {
     font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     position: absolute;
