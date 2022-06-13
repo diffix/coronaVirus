@@ -245,6 +245,11 @@ function initializePage(parsed) {
             .addEventListener('change', function (e) {
                 updateDataSet();
             });
+    }); 
+    const container = '#comparison-container';
+    new mapboxgl.Compare(map, map2, container, {
+    // Set this to enable comparing two maps by mouse movement:
+    // mousemove: true
     });
 }
 

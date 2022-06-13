@@ -38,19 +38,17 @@
     <script type="text/javascript" src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
     <link rel='stylesheet' type="text/css" href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css'/>
     <link rel="stylesheet" type="text/css" href="heatmap_conf.css"/>
-    <script type="text/javascript" src="remus.js"></script>
+    <!-- <script type="text/javascript" src="remus.js"></script> -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css" type="text/css">
 </head>
 <body>
-<link rel="stylesheet" href="remus.min.css">
+<!-- <link rel="stylesheet" href="remus.min.css"> -->
 
 
-
-<div class="remus">
-	<div class="remus-element" id='map'></div>
-	<div class="remus-element" id='map2'></div>
-	<!-- <div class="remus-element">
-		<img src="sample.jpg" alt="2">
-	</div> -->
+<div id="comparison-container">
+      <div id="map"></div>
+      <div id="map2"></div>
 </div>
 
 <div class="map-overlay-top">
@@ -85,13 +83,13 @@
       href="https://data-protection.mpi-klsb.mpg.de/sws/people/cmickler">Data Protection</a>
 </div>
 <!-- <script src="remus.min.js"></script> -->
-<script type="module">
+<!-- <script type="module">
       // import {Remus} from './remus.min.js';
       var remus = new Remus({
             element: '.remus', // selector for main Remus container
             height: 500 // height value in pixels if you want it to be fixed - optional
       });
-</script>
+</script> -->
 
 <script type="text/javascript" src="heatmap_conf.js"></script>
 </body>
