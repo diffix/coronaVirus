@@ -5,26 +5,26 @@ class MapBoxGeoJsonEncoder:
             'type': 'Polygon',
             'coordinates': [
                 [
-                    [round(lon - lonWidth / 2.0, 6), round(lat - latWidth / 2.0, 6)],
-                    [round(lon + lonWidth / 2.0, 6), round(lat - latWidth / 2.0, 6)],
-                    [round(lon + lonWidth / 2.0, 6), round(lat + latWidth / 2.0, 6)],
-                    [round(lon - lonWidth / 2.0, 6), round(lat + latWidth / 2.0, 6)],
-                    [round(lon - lonWidth / 2.0, 6), round(lat - latWidth / 2.0, 6)]
+                    [round(lon, 6), round(lat, 6)],
+                    [round(lon + lonWidth, 6), round(lat, 6)],
+                    [round(lon + lonWidth, 6), round(lat + latWidth, 6)],
+                    [round(lon, 6), round(lat + latWidth, 6)],
+                    [round(lon, 6), round(lat, 6)]
                 ]
             ]
         }
 
     @staticmethod
-    def _encodeAsPoint(lat, lon):
+    def _encodeAsPoint(lat, lon, latWidth, lonWidth):
         return {
             'type': 'Point',
-            'coordinates': [round(lon, 6), round(lat, 6)]
+            'coordinates': [round(lon + lonWidth / 2.0, 6), round(lat + latWidth / 2.0, 6)]
         }
 
     @staticmethod
     def encodeSingle(bucket, latWidth, lonWidth, asPoint=False):
         return {
-            'geometry': MapBoxGeoJsonEncoder._encodeAsPoint(bucket.lat, bucket.lon) if asPoint else
+            'geometry': MapBoxGeoJsonEncoder._encodeAsPoint(bucket.lat, bucket.lon, latWidth, lonWidth) if asPoint else
             MapBoxGeoJsonEncoder._encodeAsPolygon(bucket.lat, bucket.lon, latWidth, lonWidth),
             'type': 'Feature',
             'properties': {

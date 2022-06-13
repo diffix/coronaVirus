@@ -11,7 +11,7 @@ class MapBoxCloakAccess:
     def queryEncounterBuckets(self, latRange, lonRange, timeRange=None, raw=False):
         # FIXME a bit silly, find the correct formula
         rangeArea = latRange * lonRange
-        sql = f"SELECT diffix.round_by(pickup_latitude, {latRange}) as lat, diffix.round_by(pickup_longitude, {lonRange}) as lon, "
+        sql = f"SELECT diffix.floor_by(pickup_latitude, {latRange}) as lat, diffix.floor_by(pickup_longitude, {lonRange}) as lon, "
         groupBy = "1,2"
         if timeRange is not None:
             allowed = {'year', 'quarter', 'month', 'day', 'hour', 'minute', 'second'}
