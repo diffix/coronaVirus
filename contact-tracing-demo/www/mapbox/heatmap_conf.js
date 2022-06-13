@@ -175,7 +175,6 @@ function initializePage(parsed) {
         zoom: 13
     });
     map2.on('load', function () {
-        prepareMap();
         filterBy(startSeconds);
         dsCount = 1 < conf.dataSets.length ? conf.dataSets.length - 1 : 1;
         document.getElementById('dsSlider').max = dsCount;
