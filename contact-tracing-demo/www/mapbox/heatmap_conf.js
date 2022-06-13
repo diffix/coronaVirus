@@ -97,18 +97,12 @@ function updateDataSet() {
         }
     }
     dataSetConf = conf.dataSets[index];
-    if (document.getElementById('shCheck').checked) {
-        map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
-    } else {
-        map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
-    }
-    if (document.getElementById('srdCheck').checked) {
-        map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
-        map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
-    } else {
-        map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
-        map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
-    }
+    
+    // FIXME move
+    map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+    map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
+    map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
+
     document.getElementById('subtitle').textContent = dataSetConf.subtitle;
     document.getElementById('dataSet').textContent = "Dataset: " + dataSetConf.name;
 
@@ -173,16 +167,6 @@ function initializePage(parsed) {
             .addEventListener('click', function () {
                 toggleAnimation();
             });
-        document
-            .getElementById('shCheck')
-            .addEventListener('change', function (e) {
-                updateDataSet();
-            });
-        document
-            .getElementById('srdCheck')
-            .addEventListener('change', function (e) {
-                updateDataSet();
-            });
     });
     map2 = new mapboxgl.Map({
         container: 'map2',
@@ -234,16 +218,6 @@ function initializePage(parsed) {
             .getElementById('animationButton')
             .addEventListener('click', function () {
                 toggleAnimation();
-            });
-        document
-            .getElementById('shCheck')
-            .addEventListener('change', function (e) {
-                updateDataSet();
-            });
-        document
-            .getElementById('srdCheck')
-            .addEventListener('change', function (e) {
-                updateDataSet();
             });
     }); 
     const container = '#comparison-container';
