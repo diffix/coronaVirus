@@ -15,7 +15,7 @@ class PostgresDB:
               f"psycopg2 pg_error: {err.pgerror} pg_code: {err.pgcode}\n",
               f"------------------------------------------------------------\n")
 
-    _parameters = {
+    _default_parameters = {
         'port': 5432,
         'user': 'postgres',
         'readonly': False,
@@ -23,6 +23,7 @@ class PostgresDB:
     _required_parameters = ['host', 'port', 'dbname', 'user', 'password', 'readonly']
 
     def __init__(self, parameters):
+        self._parameters = PostgresDB._default_parameters.copy()
         for parameter, value in parameters.items():
             if parameter in self._required_parameters:
                 self._parameters[parameter] = value

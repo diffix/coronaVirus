@@ -4,13 +4,14 @@ from column_info import ColumnInfo
 
 
 class SQLAdapter:
-    _parameters = {
+    _default_parameters = {
         'anonDB': None,
         'rawDB': None,
     }
     _required_parameters = ['anonDB', 'rawDB']
 
     def __init__(self, parameters):
+        self._parameters = SQLAdapter._default_parameters.copy()
         for parameter, value in parameters.items():
             if parameter in self._required_parameters:
                 self._parameters[parameter] = value

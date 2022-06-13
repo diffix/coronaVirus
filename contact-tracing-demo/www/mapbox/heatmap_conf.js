@@ -115,7 +115,7 @@ function initializePage(parsed) {
     map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/outdoors-v11',
-        center: [7.768, 49.443],
+        center: [-73.935242, 40.730610],
         zoom: 13
     });
     map.on('load', function () {

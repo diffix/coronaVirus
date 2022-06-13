@@ -6,14 +6,15 @@ from postgres_db import PostgresDB
 
 
 class CacheDB:
-    _parameters = {
+    _default_parameters = {
         'mem_cache': True,
         'disk_cache': True,
         'disk_cache_dir_path': '_cache',
     }
-    _required_parameters = ['host', 'port', 'dbname', 'mem_cache', 'disk_cache', 'disk_cache_dir_path']
+    _required_parameters = ['host', 'port', 'dbname', 'user', 'mem_cache', 'disk_cache', 'disk_cache_dir_path']
 
     def __init__(self, parameters):
+        self._parameters = CacheDB._default_parameters.copy()
         for parameter, value in parameters.items():
             if parameter in self._required_parameters:
                 self._parameters[parameter] = value
@@ -24,7 +25,8 @@ class CacheDB:
         self._mem_cache = dict()
         self._cache_dir = os.path.join(self._parameters['disk_cache_dir_path'], f"{self._parameters['host']}." +
                                                                                 f"{self._parameters['port']}." +
-                                                                                f"{self._parameters['dbname']}")
+                                                                                f"{self._parameters['dbname']}" +
+                                                                                f"{self._parameters['user']}")
 
     def mem_cache_put(self, hash_key, dict_value):
         if not self._parameters['mem_cache']:
