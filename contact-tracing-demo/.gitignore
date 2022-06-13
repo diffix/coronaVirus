@@ -9,3 +9,6 @@ config/*
 cache/*
 www/mapbox/data/*
 www/mapbox/conf/*
+conf/mapBoxConfig.py
+conf/cloakConfig.py
+*.pickle
