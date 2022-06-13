@@ -68,6 +68,8 @@ function filterBy(seconds) {
         map.setFilter(dataSetConf.name + '-heatmap', filters);
         map.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
         map.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
+    }
+    for (dataSetConf of conf.rawDataSets) {
         map2.setFilter(dataSetConf.name + '-heatmap', filters);
         map2.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
         map2.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
@@ -86,9 +88,6 @@ function updateDataSet() {
             map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
             map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
             map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
-            map2.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
-            map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
-            map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
         }
         currentDataSet = index;
         if (conf.dataSets.length - 1 < index) {
@@ -100,24 +99,23 @@ function updateDataSet() {
     dataSetConf = conf.dataSets[index];
     if (document.getElementById('shCheck').checked) {
         map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
-        map2.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
     } else {
         map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
-        map2.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
     }
     if (document.getElementById('srdCheck').checked) {
         map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
         map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
-        map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
-        map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
     } else {
         map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
         map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
-        map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
-        map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
     }
     document.getElementById('subtitle').textContent = dataSetConf.subtitle;
     document.getElementById('dataSet').textContent = "Dataset: " + dataSetConf.name;
+
+    // FIXME move
+    map2.setLayoutProperty('encounters-raw' + '-heatmap', 'visibility', 'visible');
+    map2.setLayoutProperty('encounters-raw' + '-cloakDataRectangles', 'visibility', 'visible');
+    map2.setLayoutProperty('encounters-raw' + '-cloakDataCounts', 'visibility', 'visible');
 }
 
 function initializePage(parsed) {
@@ -253,6 +251,8 @@ function initializePage(parsed) {
 function prepareMap() {
     for (dataSetConf of conf.dataSets) {
         addDataSet(map, dataSetConf)
+    }
+    for (dataSetConf of conf.rawDataSets) {
         addDataSet(map2, dataSetConf)
     }
 }
