@@ -1,2 +1,3 @@
 /contact-tracing-demo/conf/mapBoxConfig.py
 /contact-tracing-demo/conf/cloakConfig.py
+*.pickle
