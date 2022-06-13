@@ -8,7 +8,7 @@ class MapBoxCloakAccess:
     def __init__(self):
         self._sqlAdapter = SQLAdapter(CloakConfig.parameters)
 
-    def queryEncounterBuckets(self, latRange, lonRange, timeRange=None):
+    def queryEncounterBuckets(self, latRange, lonRange, timeRange=None, raw=False):
         sql = f"SELECT diffix.round_by(pickup_latitude, {latRange}) as lat, diffix.round_by(pickup_longitude, {lonRange}) as lon, "
         groupBy = "1,2"
         if timeRange is not None:
@@ -18,7 +18,11 @@ class MapBoxCloakAccess:
             sql += f"DATE_TRUNC('{timeRange}', time), "
             groupBy += ",3"
         sql += f"COUNT(*) FROM taxi GROUP BY {groupBy};"
-        result = self._sqlAdapter.queryCloak(sql)
+        if raw:
+            result = self._sqlAdapter.queryRaw(sql)
+        else:
+            result = self._sqlAdapter.queryCloak(sql)
+
         buckets = []
         filtered = 0
         for row in result:
