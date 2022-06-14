@@ -33,7 +33,8 @@ class MapBoxGeoJsonEncoder:
             'properties': {
                 'time': round(bucket.time.timestamp()) if bucket.time is not None else -1,
                 'encounters': bucket.count,
-                'encounters_density': bucket.density
+                'encounters_density': bucket.density,
+                'lonlat_range': bucket.lonlatRange
             }
         }
 

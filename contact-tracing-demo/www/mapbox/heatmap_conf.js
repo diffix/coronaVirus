@@ -296,7 +296,7 @@ function addDataSet(mapElement, dataSetConf, isRaw) {
                 ['exponential', 1.99],
                 ['zoom'],
                 0, 1,
-                22, Math.round(10000000 * geoWidth)
+                22, ['round', ['*', ['get', 'lonlat_range'], 10000000]]
             ],
             'heatmap-weight': ['get', 'encounters_density'],
             'heatmap-intensity': 0.01
