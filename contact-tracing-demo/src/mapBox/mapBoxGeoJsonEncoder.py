@@ -23,6 +23,9 @@ class MapBoxGeoJsonEncoder:
 
     @staticmethod
     def encodeSingle(bucket, latWidth, lonWidth, asPoint=False):
+        if bucket.lonlatRange:
+            latWidth = bucket.lonlatRange
+            lonWidth = bucket.lonlatRange
         return {
             'geometry': MapBoxGeoJsonEncoder._encodeAsPoint(bucket.lat, bucket.lon, latWidth, lonWidth) if asPoint else
             MapBoxGeoJsonEncoder._encodeAsPolygon(bucket.lat, bucket.lon, latWidth, lonWidth),
