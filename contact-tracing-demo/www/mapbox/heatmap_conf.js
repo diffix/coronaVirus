@@ -81,30 +81,39 @@ function filterBy(seconds) {
 }
 
 function updateDataSet() {
-    const index = parseInt(document.getElementById('dsSlider').value, 10);
-    if (currentDataSet !== index) {
-        if (0 <= currentDataSet && currentDataSet < conf.dataSets.length) {
-            let dataSetConf = conf.dataSets[currentDataSet];
-            map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
-            map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
-            map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
-        }
-        currentDataSet = index;
-        if (conf.dataSets.length - 1 < index) {
-            document.getElementById('subtitle').textContent = "No dataset selected";
-            document.getElementById('dataSet').textContent = "Dataset: None";
-            return;
-        }
+    for (dataSetConf of conf.dataSets) {
+        map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+        map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
+        map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
     }
-    dataSetConf = conf.dataSets[index];
-    
-    // FIXME move
-    map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
-    map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
-    map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
 
-    document.getElementById('subtitle').textContent = dataSetConf.subtitle;
-    document.getElementById('dataSet').textContent = "Dataset: " + dataSetConf.name;
+    //
+    // selective version
+    //
+    // const index = parseInt(document.getElementById('dsSlider').value, 10);
+    // if (currentDataSet !== index) {
+    //     if (0 <= currentDataSet && currentDataSet < conf.dataSets.length) {
+    //         let dataSetConf = conf.dataSets[currentDataSet];
+    //         map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
+    //         map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
+    //         map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
+    //     }
+    //     currentDataSet = index;
+    //     if (conf.dataSets.length - 1 < index) {
+    //         document.getElementById('subtitle').textContent = "No dataset selected";
+    //         document.getElementById('dataSet').textContent = "Dataset: None";
+    //         return;
+    //     }
+    // }
+    // dataSetConf = conf.dataSets[index];
+    
+    // // FIXME move
+    // map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+    // map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
+    // map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
+
+    // document.getElementById('subtitle').textContent = dataSetConf.subtitle;
+    // document.getElementById('dataSet').textContent = "Dataset: " + dataSetConf.name;
 
     // FIXME move
     map2.setLayoutProperty('encounters-raw' + '-heatmap', 'visibility', 'visible');
@@ -218,7 +227,10 @@ function initializePage(parsed) {
             .addEventListener('click', function () {
                 toggleAnimation();
             });
-    }); 
+    });
+    map.on('idle', function () {
+        console.log(map.getZoom());
+    });
     const container = '#comparison-container';
     new mapboxgl.Compare(map, map2, container, {
     // Set this to enable comparing two maps by mouse movement:
@@ -228,16 +240,20 @@ function initializePage(parsed) {
 
 function prepareMap() {
     for (dataSetConf of conf.dataSets) {
-        addDataSet(map, dataSetConf)
+        addDataSet(map, dataSetConf, false)
     }
     for (dataSetConf of conf.rawDataSets) {
-        addDataSet(map2, dataSetConf)
+        addDataSet(map2, dataSetConf, true)
     }
 }
 
-function addDataSet(mapElement, dataSetConf) {
+function addDataSet(mapElement, dataSetConf, isRaw) {
     const geoWidth = parseFloat(dataSetConf.geoWidth);
     const zoomOffset = Math.log2(geoWidth / 0.0001).toFixed(1);
+    // const minZoom = (geoWidth == 0.0002 ? 10 : 15 - zoomOffset - 1);
+    const minZoom = isRaw ? 12 : 17 - zoomOffset;
+    const maxZoom = isRaw ? 17 : 17 - zoomOffset + 1;
+    console.log(dataSetConf.name, minZoom, maxZoom);
     mapElement.addSource(dataSetConf.name + '-polygons', {
         type: 'geojson',
         data: dataSetConf.polygonsFileRelativePath
@@ -250,7 +266,8 @@ function addDataSet(mapElement, dataSetConf) {
         id: dataSetConf.name + '-heatmap',
         type: 'heatmap',
         source: dataSetConf.name + '-centers',
-        minzoom: 10,
+        minzoom: minZoom,
+        maxzoom: maxZoom,
         layout: {
             'visibility': 'none'
         },
@@ -266,15 +283,14 @@ function addDataSet(mapElement, dataSetConf) {
                 0.95, 'rgb(255,255,0)',
                 1, 'rgb(255,0,0)'
             ],
-            'heatmap-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                10, 0,
-                11, 0.6,
-                15.5, 0.6,
-                16.5, 0.4
-            ],
+            // 'heatmap-opacity': [
+            //     'interpolate',
+            //     ['linear'],
+            //     ['zoom'],
+            //     (geoWidth == 0.0002 ? 10 : 15 - zoomOffset - 1), 0.3,
+            //     (minZoom + maxZoom) / 2.0, 0.6,
+            //     15 - zoomOffset + 2, 0.3
+            // ],
             'heatmap-radius': [
                 'interpolate',
                 ['exponential', 1.99],
@@ -290,19 +306,23 @@ function addDataSet(mapElement, dataSetConf) {
         id: dataSetConf.name + '-cloakDataRectangles',
         type: 'fill',
         source: dataSetConf.name + '-polygons',
-        minzoom: Math.max(10, 15 - zoomOffset),
+        minzoom: minZoom,
+        maxzoom: maxZoom,
         layout: {
             'visibility': 'none'
         },
         paint: {
             'fill-color': 'rgba(255,255,255,0)',
-            'fill-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                15.5 - zoomOffset, 0,
-                16 - zoomOffset, 0.1
-            ],
+            // 'fill-opacity': [
+            //     'interpolate',
+            //     ['linear'],
+            //     ['zoom'],
+            //     (geoWidth == 0.0002 ? 10 : 15 - zoomOffset - 1), 0.3,
+            //     (minZoom + maxZoom) / 2.0, 0.1,
+            //     15 - zoomOffset + 2, 0.3
+            //     // 15.5 - zoomOffset, 0,
+            //     // 16 - zoomOffset, 0.1
+            // ],
             'fill-outline-color': 'rgb(0,0,0)'
         }
     }, 'waterway-label');
@@ -310,7 +330,8 @@ function addDataSet(mapElement, dataSetConf) {
         id: dataSetConf.name + '-cloakDataCounts',
         type: 'symbol',
         source: dataSetConf.name + '-centers',
-        minzoom: Math.max(10, 16 - zoomOffset),
+        minzoom: minZoom,
+        maxzoom: maxZoom,
         layout: {
             'visibility': 'none',
             'text-allow-overlap': true,
@@ -325,15 +346,18 @@ function addDataSet(mapElement, dataSetConf) {
             ]
         },
         paint: {
-            'text-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                16.5 - zoomOffset, 0,
-                17 - zoomOffset, 0.4,
-                21.5 - zoomOffset, 0.4,
-                22 - zoomOffset, 0
-            ]
+            // 'text-opacity': [
+            //     'interpolate',
+            //     ['linear'],
+            //     ['zoom'],
+            //     (geoWidth == 0.0002 ? 10 : 15 - zoomOffset - 1), 0.3,
+            //     (minZoom + maxZoom) / 2.0, 0.4,
+            //     15 - zoomOffset + 2, 0.3
+            //     // 16.5 - zoomOffset, 0,
+            //     // 17 - zoomOffset, 0.4,
+            //     // 21.5 - zoomOffset, 0.4,
+            //     // 22 - zoomOffset, 0
+            // ]
         }
     });
 }
