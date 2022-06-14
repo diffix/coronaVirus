@@ -35,8 +35,6 @@ class MapBoxCloakAccess:
         return buckets
 
     def piotrEmbarrassingEncounterBuckets(self, lonlatRange):
-        # FIXME a bit silly, find the correct formula
-        rangeArea = lonlatRange * lonlatRange
         # FIXME really want to look at the result first, I'll un-hardcode later
         if lonlatRange == 2**-9:
             sql = """
@@ -51,6 +49,15 @@ WHERE lat != 0 AND lon != 0;
 """
         elif lonlatRange == 2**-10:
             sql = """
+(SELECT 0.001953125::float as lonlatRange, * 
+                   FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
+                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         count(*)
+                         FROM taxi
+                         GROUP BY 1, 2) x
+WHERE lat != 0 AND lon != 0
+EXCEPT
 SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.001953125) as lat,
@@ -58,12 +65,15 @@ SELECT 0.001953125::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625),
-                         diffix.floor_by(pickup_longitude, 0.0009765625)
+WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
+                                diffix.floor_by(lon_filter, 0.001953125) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
+                         GROUP BY 1, 2) y)
 AND lat != 0 AND lon != 0
+)
 UNION
 SELECT 0.0009765625::float as lonlatRange, * 
                    FROM (SELECT 
@@ -77,6 +87,15 @@ WHERE lat != 0 AND lon != 0;
 
         elif lonlatRange == 2**-11:
             sql = """
+(SELECT 0.001953125::float as lonlatRange, * 
+                   FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
+                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         count(*)
+                         FROM taxi
+                         GROUP BY 1, 2) x
+WHERE lat != 0 AND lon != 0
+EXCEPT
 SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.001953125) as lat,
@@ -84,18 +103,32 @@ SELECT 0.001953125::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625),
-                         diffix.floor_by(pickup_longitude, 0.0009765625)
+WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
+                                diffix.floor_by(lon_filter, 0.001953125) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
-AND NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125),
-                         diffix.floor_by(pickup_longitude, 0.00048828125)
+                         GROUP BY 1, 2) y UNION
+                      SELECT diffix.floor_by(lat_filter, 0.001953125),
+                                diffix.floor_by(lon_filter, 0.001953125) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
+                         GROUP BY 1, 2) y)
 AND lat != 0 AND lon != 0
+)
 UNION
+(SELECT 0.0009765625::float as lonlatRange, * 
+                   FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
+                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon,
+                         count(*)
+                         FROM taxi
+                         GROUP BY 1, 2) x
+WHERE lat != 0 AND lon != 0
+EXCEPT
 SELECT 0.0009765625::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
@@ -103,12 +136,15 @@ SELECT 0.0009765625::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125),
-                         diffix.floor_by(pickup_longitude, 0.00048828125)
+WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.0009765625),
+                                diffix.floor_by(lon_filter, 0.0009765625) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
+                         GROUP BY 1, 2) y)
 AND lat != 0 AND lon != 0
+)
 UNION
 SELECT 0.00048828125::float as lonlatRange, * 
                    FROM (SELECT 
@@ -121,6 +157,15 @@ WHERE lat != 0 AND lon != 0;
 """
         elif lonlatRange == 2**-12:
             sql = """
+(SELECT 0.001953125::float as lonlatRange, * 
+                   FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
+                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         count(*)
+                         FROM taxi
+                         GROUP BY 1, 2) x
+WHERE lat != 0 AND lon != 0
+EXCEPT
 SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.001953125) as lat,
@@ -128,23 +173,39 @@ SELECT 0.001953125::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625),
-                         diffix.floor_by(pickup_longitude, 0.0009765625)
+WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
+                                diffix.floor_by(lon_filter, 0.001953125) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
-AND NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125),
-                         diffix.floor_by(pickup_longitude, 0.00048828125)
+                         GROUP BY 1, 2) y UNION 
+                      SELECT diffix.floor_by(lat_filter, 0.001953125),
+                                diffix.floor_by(lon_filter, 0.001953125) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
-AND NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.000244140625),
-                         diffix.floor_by(pickup_longitude, 0.000244140625)
+                         GROUP BY 1, 2) y UNION
+                      SELECT diffix.floor_by(lat_filter, 0.001953125),
+                                diffix.floor_by(lon_filter, 0.001953125) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.000244140625) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
+                         GROUP BY 1, 2) y)
 AND lat != 0 AND lon != 0
+)
 UNION
+(SELECT 0.0009765625::float as lonlatRange, * 
+                   FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
+                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon,
+                         count(*)
+                         FROM taxi
+                         GROUP BY 1, 2) x
+WHERE lat != 0 AND lon != 0
+EXCEPT
 SELECT 0.0009765625::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
@@ -152,18 +213,32 @@ SELECT 0.0009765625::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125),
-                         diffix.floor_by(pickup_longitude, 0.00048828125)
+WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.0009765625),
+                                diffix.floor_by(lon_filter, 0.0009765625) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
-AND NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.000244140625),
-                         diffix.floor_by(pickup_longitude, 0.000244140625)
+                         GROUP BY 1, 2) y UNION
+                     SELECT diffix.floor_by(lat_filter, 0.0009765625),
+                                diffix.floor_by(lon_filter, 0.0009765625) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.000244140625) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
+                         GROUP BY 1, 2) y)
 AND lat != 0 AND lon != 0
+)
 UNION
+(SELECT 0.00048828125::float as lonlatRange, * 
+                   FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat,
+                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon,
+                         count(*)
+                         FROM taxi
+                         GROUP BY 1, 2) x
+WHERE lat != 0 AND lon != 0
+EXCEPT
 SELECT 0.00048828125::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.00048828125) as lat,
@@ -171,12 +246,15 @@ SELECT 0.00048828125::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE NOT (lat, lon) IN (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.000244140625),
-                         diffix.floor_by(pickup_longitude, 0.000244140625)
+WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.00048828125),
+                                diffix.floor_by(lon_filter, 0.00048828125) 
+                        FROM (SELECT 
+                         diffix.floor_by(pickup_latitude, 0.000244140625) as lat_filter,
+                         diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter
                          FROM taxi
-                         GROUP BY 1, 2)
+                         GROUP BY 1, 2) y)
 AND lat != 0 AND lon != 0
+)
 UNION
 SELECT 0.000244140625::float as lonlatRange, * 
                    FROM (SELECT 
@@ -192,7 +270,7 @@ WHERE lat != 0 AND lon != 0;
         buckets = []
         filtered = 0
         for row in result:
-            buckets.append(_rowToBucket2(row, rangeArea))
+            buckets.append(_rowToBucket2(row))
         print(f"Loaded {len(result)} buckets from cloak.")
         print(f"Filtered {filtered} buckets due to */NULL values.")
         self._sqlAdapter.disconnect()
@@ -214,8 +292,10 @@ def _rowToBucket(row, rangeArea):
     )
 
 # FIXME again: refactor
-def _rowToBucket2(row, rangeArea):
+def _rowToBucket2(row):
     lonlatRange = row[0]
+    # FIXME a bit silly, find the correct formula
+    rangeArea = lonlatRange ** 2
     lat = row[1]
     lon = row[2]
     # time = None
