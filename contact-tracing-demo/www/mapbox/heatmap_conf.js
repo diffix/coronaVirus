@@ -283,14 +283,15 @@ function addDataSet(mapElement, dataSetConf, isRaw) {
                 0.95, 'rgb(255,255,0)',
                 1, 'rgb(255,0,0)'
             ],
-            // 'heatmap-opacity': [
-            //     'interpolate',
-            //     ['linear'],
-            //     ['zoom'],
-            //     (geoWidth == 0.0002 ? 10 : 15 - zoomOffset - 1), 0.3,
-            //     (minZoom + maxZoom) / 2.0, 0.6,
-            //     15 - zoomOffset + 2, 0.3
-            // ],
+            'heatmap-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                10, 0,
+                11, 0.6,
+                15.5, 0.6,
+                16.5, 0.4
+            ],
             'heatmap-radius': [
                 'interpolate',
                 ['exponential', 1.99],
@@ -313,16 +314,13 @@ function addDataSet(mapElement, dataSetConf, isRaw) {
         },
         paint: {
             'fill-color': 'rgba(255,255,255,0)',
-            // 'fill-opacity': [
-            //     'interpolate',
-            //     ['linear'],
-            //     ['zoom'],
-            //     (geoWidth == 0.0002 ? 10 : 15 - zoomOffset - 1), 0.3,
-            //     (minZoom + maxZoom) / 2.0, 0.1,
-            //     15 - zoomOffset + 2, 0.3
-            //     // 15.5 - zoomOffset, 0,
-            //     // 16 - zoomOffset, 0.1
-            // ],
+            'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                15.5 - zoomOffset, 0,
+                16 - zoomOffset, 0.1
+            ],
             'fill-outline-color': 'rgb(0,0,0)'
         }
     }, 'waterway-label');
@@ -346,18 +344,15 @@ function addDataSet(mapElement, dataSetConf, isRaw) {
             ]
         },
         paint: {
-            // 'text-opacity': [
-            //     'interpolate',
-            //     ['linear'],
-            //     ['zoom'],
-            //     (geoWidth == 0.0002 ? 10 : 15 - zoomOffset - 1), 0.3,
-            //     (minZoom + maxZoom) / 2.0, 0.4,
-            //     15 - zoomOffset + 2, 0.3
-            //     // 16.5 - zoomOffset, 0,
-            //     // 17 - zoomOffset, 0.4,
-            //     // 21.5 - zoomOffset, 0.4,
-            //     // 22 - zoomOffset, 0
-            // ]
+            'text-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                16.5 - zoomOffset, 0,
+                17 - zoomOffset, 0.4,
+                21.5 - zoomOffset, 0.4,
+                22 - zoomOffset, 0
+            ]
         }
     });
 }
