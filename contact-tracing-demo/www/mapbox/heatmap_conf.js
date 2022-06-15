@@ -232,7 +232,8 @@ function initializePage(parsed) {
         console.log(map.getZoom());
     });
     const container = '#comparison-container';
-    new mapboxgl.Compare(map, map2, container, {
+    // FIXME swapped because we want anonymous on the right. Rename things and fix this
+    new mapboxgl.Compare(map2, map, container, {
     // Set this to enable comparing two maps by mouse movement:
     // mousemove: true
     });
