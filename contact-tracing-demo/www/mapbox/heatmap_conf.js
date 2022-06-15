@@ -1,83 +1,83 @@
-function startAnimation() {
-    if (timer !== null) {
-        clearInterval(timer);
-    }
-    document.getElementById('animationButton').textContent = "Stop Animation";
-    const timeout = parseInt(document.getElementById('asSlider').value, 10) * 500;
-    timer = setInterval(doAnimation, timeout);
-}
+// function startAnimation() {
+//     if (timer !== null) {
+//         clearInterval(timer);
+//     }
+//     document.getElementById('animationButton').textContent = "Stop Animation";
+//     const timeout = parseInt(document.getElementById('asSlider').value, 10) * 500;
+//     timer = setInterval(doAnimation, timeout);
+// }
 
-function stopAnimation() {
-    if (timer === null) {
-        return;
-    }
-    clearInterval(timer);
-    timer = null;
-    document.getElementById('animationButton').textContent = "Start Animation";
-}
+// function stopAnimation() {
+//     if (timer === null) {
+//         return;
+//     }
+//     clearInterval(timer);
+//     timer = null;
+//     document.getElementById('animationButton').textContent = "Start Animation";
+// }
 
-function updateAnimation() {
-    if (timer === null) {
-        return;
-    }
-    startAnimation();
-}
+// function updateAnimation() {
+//     if (timer === null) {
+//         return;
+//     }
+//     startAnimation();
+// }
 
-function toggleAnimation() {
-    if (timer === null) {
-        startAnimation();
-    } else {
-        stopAnimation();
-    }
-}
+// function toggleAnimation() {
+//     if (timer === null) {
+//         startAnimation();
+//     } else {
+//         stopAnimation();
+//     }
+// }
 
-function doAnimation() {
-    if (!incrementAnimation()) {
-        stopAnimation();
-    }
-}
+// function doAnimation() {
+//     if (!incrementAnimation()) {
+//         stopAnimation();
+//     }
+// }
 
-function incrementAnimation() {
-    let tSlider = document.getElementById('tSlider');
-    if (parseInt(tSlider.value, 10) < parseInt(tSlider.max, 10)) {
-        tSlider.stepUp();
-        updateFilter();
-        return true;
-    } else {
-        let dSlider = document.getElementById('dSlider');
-        if (parseInt(dSlider.value, 10) < parseInt(dSlider.max, 10)) {
-            tSlider.value = tSlider.min;
-            dSlider.stepUp();
-            updateFilter();
-            return true;
-        } else {
-            return false;
-        }
-    }
-}
+// function incrementAnimation() {
+//     let tSlider = document.getElementById('tSlider');
+//     if (parseInt(tSlider.value, 10) < parseInt(tSlider.max, 10)) {
+//         tSlider.stepUp();
+//         updateFilter();
+//         return true;
+//     } else {
+//         let dSlider = document.getElementById('dSlider');
+//         if (parseInt(dSlider.value, 10) < parseInt(dSlider.max, 10)) {
+//             tSlider.value = tSlider.min;
+//             dSlider.stepUp();
+//             updateFilter();
+//             return true;
+//         } else {
+//             return false;
+//         }
+//     }
+// }
 
 function updateFilter() {
-    const tChoice = parseInt(document.getElementById('tSlider').value, 10);
-    const dChoice = parseInt(document.getElementById('dSlider').value, 10);
-    filterBy(startSeconds + dChoice * 86400 + tChoice * 3600);
+    // const tChoice = parseInt(document.getElementById('tSlider').value, 10);
+    // const dChoice = parseInt(document.getElementById('dSlider').value, 10);
+    // filterBy(startSeconds + dChoice * 86400 + tChoice * 3600);
 }
 
 function filterBy(seconds) {
-    let filters = ['==', 'time', seconds];
-    for (dataSetConf of conf.dataSets) {
-        map.setFilter(dataSetConf.name + '-heatmap', filters);
-        map.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
-        map.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
-    }
-    for (dataSetConf of conf.rawDataSets) {
-        map2.setFilter(dataSetConf.name + '-heatmap', filters);
-        map2.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
-        map2.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
-    }
-    let date = new Date(seconds * 1000)
-    document.getElementById('date').textContent = 'Date: ' + date.toLocaleDateString();
-    const time = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-    document.getElementById('time').textContent = 'Time: ' + time;
+    // let filters = ['==', 'time', seconds];
+    // for (dataSetConf of conf.dataSets) {
+    //     map.setFilter(dataSetConf.name + '-heatmap', filters);
+    //     map.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
+    //     map.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
+    // }
+    // for (dataSetConf of conf.rawDataSets) {
+    //     map2.setFilter(dataSetConf.name + '-heatmap', filters);
+    //     map2.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
+    //     map2.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
+    // }
+    // let date = new Date(seconds * 1000)
+    // document.getElementById('date').textContent = 'Date: ' + date.toLocaleDateString();
+    // const time = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    // document.getElementById('time').textContent = 'Time: ' + time;
 }
 
 function updateDataSet() {
@@ -135,47 +135,47 @@ function initializePage(parsed) {
         prepareMap();
         filterBy(startSeconds);
         dsCount = 1 < conf.dataSets.length ? conf.dataSets.length - 1 : 1;
-        document.getElementById('dsSlider').max = dsCount;
-        if (initialDataSet < 0 || conf.dataSets.length - 1 < initialDataSet) {
-            console.log("Only " + conf.dataSets.length + " datasets configured. No dataset with index " +
-                initialDataSet + " present. Displaying dataset with index 0.")
-            document.getElementById('dsSlider').value = 0;
-        } else {
-            document.getElementById('dsSlider').value = initialDataSet;
-        }
+        // document.getElementById('dsSlider').max = dsCount;
+        // if (initialDataSet < 0 || conf.dataSets.length - 1 < initialDataSet) {
+        //     console.log("Only " + conf.dataSets.length + " datasets configured. No dataset with index " +
+        //         initialDataSet + " present. Displaying dataset with index 0.")
+        //     document.getElementById('dsSlider').value = 0;
+        // } else {
+        //     document.getElementById('dsSlider').value = initialDataSet;
+        // }
         updateDataSet();
         document.title = conf.title;
-        document.getElementById('title').textContent = conf.title;
-        document
-            .getElementById('dsSlider')
-            .addEventListener('input', function () {
-                updateDataSet();
-            });
-        document
-            .getElementById('tSlider')
-            .addEventListener('input', function () {
-                updateFilter();
-            });
-        document
-            .getElementById('dSlider')
-            .addEventListener('input', function () {
-                updateFilter();
-            });
-        document
-            .getElementById('asSlider')
-            .addEventListener('input', function (e) {
-                let asChoice = parseInt(e.target.value, 10) - 1;
-                if (asChoice === 0) {
-                    asChoice = 0.5;
-                }
-                document.getElementById('animationSpeed').textContent = "Animation step every: " + asChoice + "s"
-                updateAnimation();
-            });
-        document
-            .getElementById('animationButton')
-            .addEventListener('click', function () {
-                toggleAnimation();
-            });
+        // document.getElementById('title').textContent = conf.title;
+        // document
+        //     .getElementById('dsSlider')
+        //     .addEventListener('input', function () {
+        //         updateDataSet();
+        //     });
+        // document
+        //     .getElementById('tSlider')
+        //     .addEventListener('input', function () {
+        //         updateFilter();
+        //     });
+        // document
+        //     .getElementById('dSlider')
+        //     .addEventListener('input', function () {
+        //         updateFilter();
+        //     });
+        // document
+        //     .getElementById('asSlider')
+        //     .addEventListener('input', function (e) {
+        //         let asChoice = parseInt(e.target.value, 10) - 1;
+        //         if (asChoice === 0) {
+        //             asChoice = 0.5;
+        //         }
+        //         document.getElementById('animationSpeed').textContent = "Animation step every: " + asChoice + "s"
+        //         updateAnimation();
+        //     });
+        // document
+        //     .getElementById('animationButton')
+        //     .addEventListener('click', function () {
+        //         toggleAnimation();
+        //     });
     });
     map2 = new mapboxgl.Map({
         container: 'map2',
@@ -186,47 +186,47 @@ function initializePage(parsed) {
     map2.on('load', function () {
         filterBy(startSeconds);
         dsCount = 1 < conf.dataSets.length ? conf.dataSets.length - 1 : 1;
-        document.getElementById('dsSlider').max = dsCount;
-        if (initialDataSet < 0 || conf.dataSets.length - 1 < initialDataSet) {
-            console.log("Only " + conf.dataSets.length + " datasets configured. No dataset with index " +
-                initialDataSet + " present. Displaying dataset with index 0.")
-            document.getElementById('dsSlider').value = 0;
-        } else {
-            document.getElementById('dsSlider').value = initialDataSet;
-        }
+        // document.getElementById('dsSlider').max = dsCount;
+        // if (initialDataSet < 0 || conf.dataSets.length - 1 < initialDataSet) {
+        //     console.log("Only " + conf.dataSets.length + " datasets configured. No dataset with index " +
+        //         initialDataSet + " present. Displaying dataset with index 0.")
+        //     document.getElementById('dsSlider').value = 0;
+        // } else {
+        //     document.getElementById('dsSlider').value = initialDataSet;
+        // }
         updateDataSet();
         document.title = conf.title;
-        document.getElementById('title').textContent = conf.title;
-        document
-            .getElementById('dsSlider')
-            .addEventListener('input', function () {
-                updateDataSet();
-            });
-        document
-            .getElementById('tSlider')
-            .addEventListener('input', function () {
-                updateFilter();
-            });
-        document
-            .getElementById('dSlider')
-            .addEventListener('input', function () {
-                updateFilter();
-            });
-        document
-            .getElementById('asSlider')
-            .addEventListener('input', function (e) {
-                let asChoice = parseInt(e.target.value, 10) - 1;
-                if (asChoice === 0) {
-                    asChoice = 0.5;
-                }
-                document.getElementById('animationSpeed').textContent = "Animation step every: " + asChoice + "s"
-                updateAnimation();
-            });
-        document
-            .getElementById('animationButton')
-            .addEventListener('click', function () {
-                toggleAnimation();
-            });
+        // document.getElementById('title').textContent = conf.title;
+        // document
+        //     .getElementById('dsSlider')
+        //     .addEventListener('input', function () {
+        //         updateDataSet();
+        //     });
+        // document
+        //     .getElementById('tSlider')
+        //     .addEventListener('input', function () {
+        //         updateFilter();
+        //     });
+        // document
+        //     .getElementById('dSlider')
+        //     .addEventListener('input', function () {
+        //         updateFilter();
+        //     });
+        // document
+        //     .getElementById('asSlider')
+        //     .addEventListener('input', function (e) {
+        //         let asChoice = parseInt(e.target.value, 10) - 1;
+        //         if (asChoice === 0) {
+        //             asChoice = 0.5;
+        //         }
+        //         document.getElementById('animationSpeed').textContent = "Animation step every: " + asChoice + "s"
+        //         updateAnimation();
+        //     });
+        // document
+        //     .getElementById('animationButton')
+        //     .addEventListener('click', function () {
+        //         toggleAnimation();
+        //     });
     });
     map.on('idle', function () {
         console.log(map.getZoom());
