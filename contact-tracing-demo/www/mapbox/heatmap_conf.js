@@ -82,9 +82,16 @@ function filterBy(seconds) {
 
 function updateDataSet() {
     for (dataSetConf of conf.dataSets) {
-        map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
-        map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
-        map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
+        // FIXME map vs map2
+        if (dataSetConf.isRaw) {
+            map2.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+            map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
+            map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
+        } else {
+            map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+            map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
+            map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
+        }
     }
 
     //
@@ -114,11 +121,6 @@ function updateDataSet() {
 
     // document.getElementById('subtitle').textContent = dataSetConf.subtitle;
     // document.getElementById('dataSet').textContent = "Dataset: " + dataSetConf.name;
-
-    // FIXME move
-    map2.setLayoutProperty('encounters-raw' + '-heatmap', 'visibility', 'visible');
-    map2.setLayoutProperty('encounters-raw' + '-cloakDataRectangles', 'visibility', 'visible');
-    map2.setLayoutProperty('encounters-raw' + '-cloakDataCounts', 'visibility', 'visible');
 }
 
 function initializePage(parsed) {
@@ -240,21 +242,23 @@ function initializePage(parsed) {
 }
 
 function prepareMap() {
+    // Assuming that the coarsest comes first here.
+    const maxGeoWidth = conf.dataSets[0].geoWidth;
     for (dataSetConf of conf.dataSets) {
         if (dataSetConf.isRaw) {
-            addDataSet(map2, dataSetConf, true)
+            addDataSet(map2, dataSetConf, maxGeoWidth)
         } else {
-            addDataSet(map, dataSetConf, false)
+            addDataSet(map, dataSetConf, maxGeoWidth)
         }
     }
 }
 
-function addDataSet(mapElement, dataSetConf, isRaw) {
+function addDataSet(mapElement, dataSetConf, maxGeoWidth) {
     const geoWidth = parseFloat(dataSetConf.geoWidth);
-    const zoomOffset = Math.log2(geoWidth / 0.0001).toFixed(1);
-    // const minZoom = (geoWidth == 0.0002 ? 10 : 15 - zoomOffset - 1);
-    const minZoom = isRaw ? 12 : 17 - zoomOffset;
-    const maxZoom = isRaw ? 17 : 17 - zoomOffset + 1;
+    const zoomOffset = Math.log2(geoWidth / 0.0001).toFixed(1); // ~2-5
+    const minZoomHeatmap = (geoWidth == maxGeoWidth ? 10 : 17.5 - zoomOffset);
+    const minZoom = 17.5 - zoomOffset;
+    const maxZoom = 17.5 - zoomOffset + 1;
     console.log(dataSetConf.name, minZoom, maxZoom);
     mapElement.addSource(dataSetConf.name + '-polygons', {
         type: 'geojson',
@@ -268,7 +272,7 @@ function addDataSet(mapElement, dataSetConf, isRaw) {
         id: dataSetConf.name + '-heatmap',
         type: 'heatmap',
         source: dataSetConf.name + '-centers',
-        minzoom: minZoom,
+        minzoom: minZoomHeatmap,
         maxzoom: maxZoom,
         layout: {
             'visibility': 'none'
@@ -301,7 +305,7 @@ function addDataSet(mapElement, dataSetConf, isRaw) {
                 0, 1,
                 22, ['round', ['*', ['get', 'lonlat_range'], 10000000]]
             ],
-            'heatmap-weight': ['get', 'encounters_density'],
+            'heatmap-weight': ['get', 'encounters'],
             'heatmap-intensity': 0.01
         }
     }, 'waterway-label');
