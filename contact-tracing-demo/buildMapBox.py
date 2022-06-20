@@ -67,9 +67,7 @@ cloak = MapBoxCloakAccess()
 
 confLst = list()
 for geoWidth in [2**-9, 2**-10, 2**-11, 2**-12]:
-    # buckets = cloak.queryEncounterBuckets(geoWidth, geoWidth, 'hour')
     buckets = cloak.piotrEmbarrassingEncounterBuckets(geoWidth)
-    # buckets = cloak.queryEncounterBuckets(geoWidth, geoWidth)
     confLst.append(MapBoxCreator.createMap(f"encounters-{geoWidth}", f"Lat/Lng width: {geoWidth}", buckets, geoWidth,
                                            geoWidth))
 

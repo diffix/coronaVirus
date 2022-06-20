@@ -35,9 +35,11 @@ class MapBoxCloakAccess:
         return buckets
 
     def piotrEmbarrassingEncounterBuckets(self, lonlatRange):
+        common_filters = "lat != 0 AND lon != 0"
+
         # FIXME really want to look at the result first, I'll un-hardcode later
         if lonlatRange == 2**-9:
-            sql = """
+            sql = f"""
 SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.001953125) as lat,
@@ -45,10 +47,10 @@ SELECT 0.001953125::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0;
+WHERE {common_filters};
 """
         elif lonlatRange == 2**-10:
-            sql = """
+            sql = f"""
 (SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.001953125) as lat,
@@ -56,7 +58,7 @@ WHERE lat != 0 AND lon != 0;
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0
+WHERE {common_filters}
 EXCEPT
 SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
@@ -72,7 +74,7 @@ WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
                          diffix.floor_by(pickup_longitude, 0.0009765625) as lon_filter
                          FROM taxi
                          GROUP BY 1, 2) y)
-AND lat != 0 AND lon != 0
+AND {common_filters}
 )
 UNION
 SELECT 0.0009765625::float as lonlatRange, * 
@@ -82,11 +84,11 @@ SELECT 0.0009765625::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0;
+WHERE {common_filters};
 """
 
         elif lonlatRange == 2**-11:
-            sql = """
+            sql = f"""
 (SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.001953125) as lat,
@@ -94,7 +96,7 @@ WHERE lat != 0 AND lon != 0;
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0
+WHERE {common_filters}
 EXCEPT
 SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
@@ -117,7 +119,7 @@ WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
                          diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter
                          FROM taxi
                          GROUP BY 1, 2) y)
-AND lat != 0 AND lon != 0
+AND {common_filters}
 )
 UNION
 (SELECT 0.0009765625::float as lonlatRange, * 
@@ -127,7 +129,7 @@ UNION
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0
+WHERE {common_filters}
 EXCEPT
 SELECT 0.0009765625::float as lonlatRange, * 
                    FROM (SELECT 
@@ -143,7 +145,7 @@ WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.0009765625),
                          diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter
                          FROM taxi
                          GROUP BY 1, 2) y)
-AND lat != 0 AND lon != 0
+AND {common_filters}
 )
 UNION
 SELECT 0.00048828125::float as lonlatRange, * 
@@ -153,10 +155,10 @@ SELECT 0.00048828125::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0;
+WHERE {common_filters};
 """
         elif lonlatRange == 2**-12:
-            sql = """
+            sql = f"""
 (SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
                          diffix.floor_by(pickup_latitude, 0.001953125) as lat,
@@ -164,7 +166,7 @@ WHERE lat != 0 AND lon != 0;
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0
+WHERE {common_filters}
 EXCEPT
 SELECT 0.001953125::float as lonlatRange, * 
                    FROM (SELECT 
@@ -194,7 +196,7 @@ WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
                          diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter
                          FROM taxi
                          GROUP BY 1, 2) y)
-AND lat != 0 AND lon != 0
+AND {common_filters}
 )
 UNION
 (SELECT 0.0009765625::float as lonlatRange, * 
@@ -204,7 +206,7 @@ UNION
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0
+WHERE {common_filters}
 EXCEPT
 SELECT 0.0009765625::float as lonlatRange, * 
                    FROM (SELECT 
@@ -227,7 +229,7 @@ WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.0009765625),
                          diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter
                          FROM taxi
                          GROUP BY 1, 2) y)
-AND lat != 0 AND lon != 0
+AND {common_filters}
 )
 UNION
 (SELECT 0.00048828125::float as lonlatRange, * 
@@ -237,7 +239,7 @@ UNION
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0
+WHERE {common_filters}
 EXCEPT
 SELECT 0.00048828125::float as lonlatRange, * 
                    FROM (SELECT 
@@ -253,7 +255,7 @@ WHERE (lat, lon) IN (SELECT diffix.floor_by(lat_filter, 0.00048828125),
                          diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter
                          FROM taxi
                          GROUP BY 1, 2) y)
-AND lat != 0 AND lon != 0
+AND {common_filters}
 )
 UNION
 SELECT 0.000244140625::float as lonlatRange, * 
@@ -263,7 +265,7 @@ SELECT 0.000244140625::float as lonlatRange, *
                          count(*)
                          FROM taxi
                          GROUP BY 1, 2) x
-WHERE lat != 0 AND lon != 0;
+WHERE {common_filters};
 """
         result = self._sqlAdapter.queryCloak(sql)
 
