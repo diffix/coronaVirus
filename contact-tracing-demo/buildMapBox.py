@@ -72,8 +72,9 @@ for geoWidth in [2**-9, 2**-10, 2**-11, 2**-12]:
     # buckets = cloak.queryEncounterBuckets(geoWidth, geoWidth)
     confLst.append(MapBoxCreator.createMap(f"encounters-{geoWidth}", f"Lat/Lng width: {geoWidth}", buckets, geoWidth,
                                            geoWidth))
+
 buckets = cloak.queryEncounterBuckets(2**-12, 2**-12, raw=True)
-confLst.append(MapBoxCreator.createMap(f"encounters-raw", f"Non-anonymized data", buckets, 2**-12, 2**-12))
+confLst.append(MapBoxCreator.createMap(f"encounters-raw", f"Non-anonymized data", buckets, 2**-12, 2**-12, raw=True))
 conf = MapBoxCreator.createMergedMap('encounters', title, confLst)
 
 MapBoxCreator.printLinks('Local', title, confLst, conf)

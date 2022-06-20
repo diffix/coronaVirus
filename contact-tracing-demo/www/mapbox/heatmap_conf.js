@@ -241,10 +241,11 @@ function initializePage(parsed) {
 
 function prepareMap() {
     for (dataSetConf of conf.dataSets) {
-        addDataSet(map, dataSetConf, false)
-    }
-    for (dataSetConf of conf.rawDataSets) {
-        addDataSet(map2, dataSetConf, true)
+        if (dataSetConf.isRaw) {
+            addDataSet(map2, dataSetConf, true)
+        } else {
+            addDataSet(map, dataSetConf, false)
+        }
     }
 }
 

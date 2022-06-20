@@ -53,7 +53,7 @@ class MapBoxCreator:
                f"accessToken={urllib.parse.quote(MapBoxConfig.parameters['accessToken'])}"
 
     @staticmethod
-    def createMap(name, subtitle, buckets, latWidth, lonWidth, mapBoxPath=None):
+    def createMap(name, subtitle, buckets, latWidth, lonWidth, mapBoxPath=None, raw=False):
         if mapBoxPath is None:
             mapBoxPath = os.path.join('www', 'mapbox')
         polygonsFileRelativePath, centersFileRelativePath = MapBoxCreator._writeData(name, buckets, latWidth, lonWidth,
@@ -65,6 +65,7 @@ class MapBoxCreator:
             'centersFileRelativePath': centersFileRelativePath,
             'startSeconds': MapBoxCreator._findStartSeconds(buckets),
             'geoWidth': max(round((latWidth + lonWidth) / 2.0, 6), 0.000001),
+            'isRaw': raw,
         }
 
     @staticmethod
@@ -94,7 +95,6 @@ class MapBoxCreator:
             'title': title,
             'accessToken': MapBoxConfig.parameters['accessToken'],
             'startSeconds': startSeconds,
-            # FIXME handle moving the raw dataset to rawDataSets
             'dataSets': localConfLst,
         }
         confPath = os.path.join(mapBoxPath, 'conf')
