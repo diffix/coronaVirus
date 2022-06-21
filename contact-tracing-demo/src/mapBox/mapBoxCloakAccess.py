@@ -346,18 +346,16 @@ def _rowToBucket(row):
         lon,
         time=time,
         count=count,
-        density=count / rangeArea / 250000,
         lonlatRange=lonlatRange
     )
 
 
 class MapBoxBucket:
-    def __init__(self, lat, lon, time=None, count=-1, density=-1, lonlatRange=None):
+    def __init__(self, lat, lon, time=None, count=-1, lonlatRange=None):
         self.lat = lat
         self.lon = lon
         self.time = time
         self.count = count
-        self.density = density
         self.lonlatRange = lonlatRange
 
     def __str__(self):
@@ -366,4 +364,4 @@ class MapBoxBucket:
     __repr__ = __str__
 
     def listOfStrings(self):
-        return [f"{v}" for v in [self.lat, self.lon, self.time, self.count, self.density, self.lonlatRange] if v is not None]
+        return [f"{v}" for v in [self.lat, self.lon, self.time, self.count, self.lonlatRange] if v is not None]

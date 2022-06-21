@@ -33,7 +33,6 @@ class MapBoxGeoJsonEncoder:
             'properties': {
                 'time': round(bucket.time.timestamp()) if bucket.time is not None else -1,
                 'encounters': bucket.count,
-                'encounters_density': bucket.density,
                 # FIXME we really need to simplify this to not allow latWidth<>lon
                 'lonlat_range': latWidth
             }
