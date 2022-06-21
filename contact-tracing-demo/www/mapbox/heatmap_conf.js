@@ -310,7 +310,7 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
                 0, 1,
                 22, ['round', ['*', ['get', 'lonlat_range'], 10000000]]
             ],
-            'heatmap-weight': ['get', 'encounters'],
+            'heatmap-weight': ['get', 'fare_amounts'],
             'heatmap-intensity': 0.01
         }
     }, 'waterway-label');
@@ -345,7 +345,7 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
             'visibility': 'none',
             'text-allow-overlap': true,
             'text-ignore-placement': true,
-            'text-field': ['to-string', ['get', 'encounters']],
+            'text-field': ['to-string', ['get', 'fare_amounts']],
             'text-size': [
                 'interpolate',
                 ['exponential', 1.99],
