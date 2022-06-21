@@ -57,27 +57,31 @@
 // }
 
 function updateFilter() {
-    // const tChoice = parseInt(document.getElementById('tSlider').value, 10);
+    const tChoice = parseInt(document.getElementById('tSlider').value, 10);
     // const dChoice = parseInt(document.getElementById('dSlider').value, 10);
-    // filterBy(startSeconds + dChoice * 86400 + tChoice * 3600);
+    const dChoice = 0;
+    filterBy(startSeconds + dChoice * 86400 + tChoice * 3600);
 }
 
 function filterBy(seconds) {
-    // let filters = ['==', 'time', seconds];
-    // for (dataSetConf of conf.dataSets) {
-    //     map.setFilter(dataSetConf.name + '-heatmap', filters);
-    //     map.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
-    //     map.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
-    // }
-    // for (dataSetConf of conf.rawDataSets) {
-    //     map2.setFilter(dataSetConf.name + '-heatmap', filters);
-    //     map2.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
-    //     map2.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
-    // }
-    // let date = new Date(seconds * 1000)
+    let filters = ['==', 'time', seconds];
+
+    for (dataSetConf of conf.dataSets) {
+        // FIXME map vs map2
+        if (dataSetConf.isRaw) {
+            map2.setFilter(dataSetConf.name + '-heatmap', filters);
+            map2.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
+            map2.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
+        } else {
+            map.setFilter(dataSetConf.name + '-heatmap', filters);
+            map.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
+            map.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
+        }
+    }
+    let date = new Date(seconds * 1000)
     // document.getElementById('date').textContent = 'Date: ' + date.toLocaleDateString();
-    // const time = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-    // document.getElementById('time').textContent = 'Time: ' + time;
+    const time = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    document.getElementById('time').textContent = 'Time: ' + time;
 }
 
 function updateDataSet() {
@@ -153,11 +157,11 @@ function initializePage(parsed) {
         //     .addEventListener('input', function () {
         //         updateDataSet();
         //     });
-        // document
-        //     .getElementById('tSlider')
-        //     .addEventListener('input', function () {
-        //         updateFilter();
-        //     });
+        document
+            .getElementById('tSlider')
+            .addEventListener('input', function () {
+                updateFilter();
+            });
         // document
         //     .getElementById('dSlider')
         //     .addEventListener('input', function () {
@@ -204,11 +208,11 @@ function initializePage(parsed) {
         //     .addEventListener('input', function () {
         //         updateDataSet();
         //     });
-        // document
-        //     .getElementById('tSlider')
-        //     .addEventListener('input', function () {
-        //         updateFilter();
-        //     });
+        document
+            .getElementById('tSlider')
+            .addEventListener('input', function () {
+                updateFilter();
+            });
         // document
         //     .getElementById('dSlider')
         //     .addEventListener('input', function () {
