@@ -248,21 +248,22 @@ function initializePage(parsed) {
 function prepareMap() {
     // Assuming that the coarsest comes first here.
     const maxGeoWidth = conf.dataSets[0].geoWidth;
+    const minGeoWidth = conf.dataSets[conf.dataSets.length - 1].geoWidth;
     for (dataSetConf of conf.dataSets) {
         if (dataSetConf.isRaw) {
-            addDataSet(map2, dataSetConf, maxGeoWidth)
+            addDataSet(map2, dataSetConf, minGeoWidth, maxGeoWidth)
         } else {
-            addDataSet(map, dataSetConf, maxGeoWidth)
+            addDataSet(map, dataSetConf, minGeoWidth, maxGeoWidth)
         }
     }
 }
 
-function addDataSet(mapElement, dataSetConf, maxGeoWidth) {
+function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
     const geoWidth = parseFloat(dataSetConf.geoWidth);
     const zoomOffset = Math.log2(geoWidth / 0.0001).toFixed(1); // ~2-5
     const minZoomHeatmap = (geoWidth == maxGeoWidth ? 10 : 17.5 - zoomOffset);
     const minZoom = 17.5 - zoomOffset;
-    const maxZoom = 17.5 - zoomOffset + 1;
+    const maxZoom = (geoWidth == minGeoWidth) ? 20 : 17.5 - zoomOffset + 1;
     console.log(dataSetConf.name, minZoom, maxZoom);
     mapElement.addSource(dataSetConf.name + '-polygons', {
         type: 'geojson',
