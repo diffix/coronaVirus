@@ -30,11 +30,9 @@ WHERE {commonFilters};
             result = self._sqlAdapter.queryCloak(sql)
 
         buckets = []
-        filtered = 0
         for row in result:
             buckets.append(_rowToBucket(row))
-        print(f"Loaded {len(result)} buckets from cloak.")
-        print(f"Filtered {filtered} buckets due to */NULL values.")
+        print(f"Loaded {len(result)} raw buckets with range {lonlatRange}.")
         self._sqlAdapter.disconnect()
         return buckets
 
@@ -340,11 +338,9 @@ WHERE {commonFilters};
         result = self._sqlAdapter.queryCloak(sql)
 
         buckets = []
-        filtered = 0
         for row in result:
             buckets.append(_rowToBucket(row))
-        print(f"Loaded {len(result)} buckets from cloak.")
-        print(f"Filtered {filtered} buckets due to */NULL values.")
+        print(f"Loaded {len(result)} anon buckets with range {lonlatRange}.")
         self._sqlAdapter.disconnect()
         return buckets
 
