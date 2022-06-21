@@ -18,11 +18,11 @@ class MapBoxCreator:
         gjPolygons = MapBoxGeoJsonEncoder.encodeMany(buckets, latWidth, lonWidth, asPoints=False)
         polygonsFileRelativePath = os.path.join('data', f"{name}-polygons.geojson")
         with open(os.path.join(mapBoxPath, polygonsFileRelativePath), 'w') as f:
-            json.dump(gjPolygons, f, indent=4)
+            json.dump(gjPolygons, f)
         gjCenters = MapBoxGeoJsonEncoder.encodeMany(buckets, latWidth, lonWidth, asPoints=True)
         centersFileRelativePath = os.path.join('data', f"{name}-centers.geojson")
         with open(os.path.join(mapBoxPath, centersFileRelativePath), 'w') as f:
-            json.dump(gjCenters, f, indent=4)
+            json.dump(gjCenters, f)
         return polygonsFileRelativePath, centersFileRelativePath
 
     @staticmethod
@@ -102,7 +102,7 @@ class MapBoxCreator:
             os.makedirs(confPath)
         confFileRelativePath = os.path.join('conf', f"{name}.json")
         with open(os.path.join(mapBoxPath, confFileRelativePath), 'w') as f:
-            json.dump(conf, f, indent=4)
+            json.dump(conf, f)
         return {
             'conf': conf,
             'confFileRelativePath': confFileRelativePath,
