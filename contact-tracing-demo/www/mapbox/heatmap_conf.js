@@ -343,7 +343,7 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
                 ['exponential', 1.99],
                 ['zoom'],
                 0, 1,
-                22, Math.round(2000000 * geoWidth)
+                22, Math.round(1750000 * geoWidth)
             ]
         },
         paint: {
