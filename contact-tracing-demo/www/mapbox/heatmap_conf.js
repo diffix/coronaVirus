@@ -267,11 +267,15 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
     console.log(dataSetConf.name, minZoom, maxZoom);
     mapElement.addSource(dataSetConf.name + '-polygons', {
         type: 'geojson',
-        data: dataSetConf.polygonsFileRelativePath
+        data: dataSetConf.polygonsFileRelativePath,
+        // increase if you see rendering errors
+        buffer: 8
     });
     mapElement.addSource(dataSetConf.name + '-centers', {
         type: 'geojson',
-        data: dataSetConf.centersFileRelativePath
+        data: dataSetConf.centersFileRelativePath,
+        // increase if you see rendering errors
+        buffer: 2
     });
     mapElement.addLayer({
         id: dataSetConf.name + '-heatRectangles',
