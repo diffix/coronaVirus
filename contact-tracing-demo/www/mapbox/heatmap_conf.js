@@ -69,11 +69,11 @@ function filterBy(seconds) {
     for (dataSetConf of conf.dataSets) {
         // FIXME map vs map2
         if (dataSetConf.isRaw) {
-            map2.setFilter(dataSetConf.name + '-heatmap', filters);
+            map2.setFilter(dataSetConf.name + '-heatRectangles', filters);
             map2.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
             map2.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
         } else {
-            map.setFilter(dataSetConf.name + '-heatmap', filters);
+            map.setFilter(dataSetConf.name + '-heatRectangles', filters);
             map.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
             map.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
         }
@@ -88,11 +88,11 @@ function updateDataSet() {
     for (dataSetConf of conf.dataSets) {
         // FIXME map vs map2
         if (dataSetConf.isRaw) {
-            map2.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+            map2.setLayoutProperty(dataSetConf.name + '-heatRectangles', 'visibility', 'visible');
             map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
             map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
         } else {
-            map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+            map.setLayoutProperty(dataSetConf.name + '-heatRectangles', 'visibility', 'visible');
             map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
             map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
         }
@@ -105,7 +105,7 @@ function updateDataSet() {
     // if (currentDataSet !== index) {
     //     if (0 <= currentDataSet && currentDataSet < conf.dataSets.length) {
     //         let dataSetConf = conf.dataSets[currentDataSet];
-    //         map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'none');
+    //         map.setLayoutProperty(dataSetConf.name + '-heatRectangles', 'visibility', 'none');
     //         map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
     //         map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
     //     }
@@ -119,7 +119,7 @@ function updateDataSet() {
     // dataSetConf = conf.dataSets[index];
     
     // // FIXME move
-    // map.setLayoutProperty(dataSetConf.name + '-heatmap', 'visibility', 'visible');
+    // map.setLayoutProperty(dataSetConf.name + '-heatRectangles', 'visibility', 'visible');
     // map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
     // map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
 
@@ -274,27 +274,27 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
         data: dataSetConf.centersFileRelativePath
     });
     mapElement.addLayer({
-        id: dataSetConf.name + '-heatmap',
-        type: 'heatmap',
-        source: dataSetConf.name + '-centers',
+        id: dataSetConf.name + '-heatRectangles',
+        type: 'fill',
+        source: dataSetConf.name + '-polygons',
         minzoom: minZoomHeatmap,
         maxzoom: maxZoom,
         layout: {
             'visibility': 'none'
         },
         paint: {
-            'heatmap-color': [
-                'interpolate',
-                ['linear'],
-                ['heatmap-density'],
-                0, 'rgba(0,0,255,0)',
-                0.05, 'rgb(65,105,225)',
-                0.35, 'rgb(0,255,255)',
-                0.65, 'rgb(0,255,0)',
-                0.95, 'rgb(255,255,0)',
-                1, 'rgb(255,0,0)'
-            ],
-            'heatmap-opacity': [
+            'fill-color': [
+                            'interpolate',
+                            ['linear'],
+                            ['get', 'fare_amounts'],
+                            0.0, 'rgba(0,0,255,0)',
+                            40.0, 'rgb(65,105,225)',
+                            60.0, 'rgb(0,255,255)',
+                            80.0, 'rgb(0,255,0)',
+                            100.0, 'rgb(255,255,0)',
+                            120.0, 'rgb(255,0,0)'
+                        ],
+            'fill-opacity': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
@@ -303,15 +303,7 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
                 15.5, 0.6,
                 16.5, 0.4
             ],
-            'heatmap-radius': [
-                'interpolate',
-                ['exponential', 1.99],
-                ['zoom'],
-                0, 1,
-                22, ['round', ['*', ['get', 'lonlat_range'], 8000000]]
-            ],
-            'heatmap-weight': ['get', 'fare_amounts'],
-            'heatmap-intensity': 0.02
+            'fill-outline-color': 'rgba(255,255,255,0)'
         }
     }, 'waterway-label');
     mapElement.addLayer({
