@@ -308,10 +308,10 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
                 ['exponential', 1.99],
                 ['zoom'],
                 0, 1,
-                22, ['round', ['*', ['get', 'lonlat_range'], 10000000]]
+                22, ['round', ['*', ['get', 'lonlat_range'], 8000000]]
             ],
             'heatmap-weight': ['get', 'fare_amounts'],
-            'heatmap-intensity': 0.01
+            'heatmap-intensity': 0.02
         }
     }, 'waterway-label');
     mapElement.addLayer({
