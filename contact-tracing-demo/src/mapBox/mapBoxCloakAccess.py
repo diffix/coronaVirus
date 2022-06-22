@@ -41,10 +41,10 @@ WHERE {commonFilters};
         # FIXME really want to look at the result first, I'll un-hardcode later
         if lonlatRange == 2**-9:
             sql = f"""
-SELECT 0.001953125::float as lonlatRange, * 
+SELECT {lonlatRange}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -55,10 +55,10 @@ WHERE {commonFilters};
 """
         elif lonlatRange == 2**-10:
             sql = f"""
-(SELECT 0.001953125::float as lonlatRange, * 
+(SELECT {lonlatRange * 2}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -67,22 +67,22 @@ WHERE {commonFilters};
                          GROUP BY 1, 2, 4, 5) x
 WHERE {commonFilters}
 EXCEPT
-SELECT 0.001953125::float as lonlatRange, * 
+SELECT {lonlatRange * 2}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
                           round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8
                           FROM taxi
                          GROUP BY 1, 2, 4, 5) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
-                            diffix.floor_by(lon_filter, 0.001953125),
+WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2}),
+                            diffix.floor_by(lon_filter, {lonlatRange * 2}),
                             time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
@@ -92,10 +92,10 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
 AND {commonFilters}
 )
 UNION
-SELECT 0.0009765625::float as lonlatRange, * 
+SELECT {lonlatRange}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
-                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -107,10 +107,10 @@ WHERE {commonFilters};
 
         elif lonlatRange == 2**-11:
             sql = f"""
-(SELECT 0.001953125::float as lonlatRange, * 
+(SELECT {lonlatRange * 4}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -119,34 +119,34 @@ WHERE {commonFilters};
                          GROUP BY 1, 2, 4, 5) x
 WHERE {commonFilters}
 EXCEPT
-SELECT 0.001953125::float as lonlatRange, * 
+SELECT {lonlatRange * 4}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
                           round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8
                           FROM taxi
                          GROUP BY 1, 2, 4, 5) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
-                            diffix.floor_by(lon_filter, 0.001953125),
+WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
+                            diffix.floor_by(lon_filter, {lonlatRange * 4}),
                             time_filter 
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
                         WHERE {commonFiltersFilter}
                      UNION
-                      SELECT diffix.floor_by(lat_filter, 0.001953125),
-                             diffix.floor_by(lon_filter, 0.001953125),
+                      SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
+                             diffix.floor_by(lon_filter, {lonlatRange * 4}),
                              time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
@@ -156,10 +156,10 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
 AND {commonFilters}
 )
 UNION
-(SELECT 0.0009765625::float as lonlatRange, * 
+(SELECT {lonlatRange * 2}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
-                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -168,22 +168,22 @@ UNION
                          GROUP BY 1, 2, 4, 5) x
 WHERE {commonFilters}
 EXCEPT
-SELECT 0.0009765625::float as lonlatRange, * 
+SELECT {lonlatRange * 2}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
-                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
                           round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8
                           FROM taxi
                          GROUP BY 1, 2, 4, 5) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.0009765625),
-                            diffix.floor_by(lon_filter, 0.0009765625),
+WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2}),
+                            diffix.floor_by(lon_filter, {lonlatRange * 2}),
                             time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
@@ -193,10 +193,10 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.0009765625),
 AND {commonFilters}
 )
 UNION
-SELECT 0.00048828125::float as lonlatRange, * 
+SELECT {lonlatRange}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -207,10 +207,10 @@ WHERE {commonFilters};
 """
         elif lonlatRange == 2**-12:
             sql = f"""
-(SELECT 0.001953125::float as lonlatRange, * 
+(SELECT {lonlatRange * 8}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 8}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 8}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -219,46 +219,46 @@ WHERE {commonFilters};
                          GROUP BY 1, 2, 4, 5) x
 WHERE {commonFilters}
 EXCEPT
-SELECT 0.001953125::float as lonlatRange, * 
+SELECT {lonlatRange * 8}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.001953125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.001953125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 8}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 8}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
                           round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8
                           FROM taxi
                          GROUP BY 1, 2, 4, 5) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
-                            diffix.floor_by(lon_filter, 0.001953125),
+WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 8}),
+                            diffix.floor_by(lon_filter, {lonlatRange * 8}),
                             time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
                         WHERE {commonFiltersFilter}
                      UNION 
-                      SELECT diffix.floor_by(lat_filter, 0.001953125),
-                             diffix.floor_by(lon_filter, 0.001953125),
+                      SELECT diffix.floor_by(lat_filter, {lonlatRange * 8}),
+                             diffix.floor_by(lon_filter, {lonlatRange * 8}),
                              time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
                         WHERE {commonFiltersFilter}
                      UNION
-                      SELECT diffix.floor_by(lat_filter, 0.001953125),
-                             diffix.floor_by(lon_filter, 0.001953125),
+                      SELECT diffix.floor_by(lat_filter, {lonlatRange * 8}),
+                             diffix.floor_by(lon_filter, {lonlatRange * 8}),
                              time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.000244140625) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
@@ -268,10 +268,10 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.001953125),
 AND {commonFilters}
 )
 UNION
-(SELECT 0.0009765625::float as lonlatRange, * 
+(SELECT {lonlatRange * 4}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
-                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -280,34 +280,34 @@ UNION
                          GROUP BY 1, 2, 4, 5) x
 WHERE {commonFilters}
 EXCEPT
-SELECT 0.0009765625::float as lonlatRange, * 
+SELECT {lonlatRange * 4}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.0009765625) as lat,
-                         diffix.floor_by(pickup_longitude, 0.0009765625) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
                           round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8
                           FROM taxi
                          GROUP BY 1, 2, 4, 5) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.0009765625),
-                            diffix.floor_by(lon_filter, 0.0009765625),
+WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
+                            diffix.floor_by(lon_filter, {lonlatRange * 4}),
                             time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
                         WHERE {commonFiltersFilter}
                      UNION
-                     SELECT diffix.floor_by(lat_filter, 0.0009765625),
-                            diffix.floor_by(lon_filter, 0.0009765625),
+                     SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
+                            diffix.floor_by(lon_filter, {lonlatRange * 4}),
                             time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.000244140625) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
@@ -317,10 +317,10 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.0009765625),
 AND {commonFilters}
 )
 UNION
-(SELECT 0.00048828125::float as lonlatRange, * 
+(SELECT {lonlatRange * 2}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
@@ -329,22 +329,22 @@ UNION
                          GROUP BY 1, 2, 4, 5) x
 WHERE {commonFilters}
 EXCEPT
-SELECT 0.00048828125::float as lonlatRange, * 
+SELECT {lonlatRange * 2}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.00048828125) as lat,
-                         diffix.floor_by(pickup_longitude, 0.00048828125) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
                           round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8
                           FROM taxi
                          GROUP BY 1, 2, 4, 5) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.00048828125),
-                            diffix.floor_by(lon_filter, 0.00048828125),
+WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2}),
+                            diffix.floor_by(lon_filter, {lonlatRange * 2}),
                             time_filter
                         FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.000244140625) as lat_filter,
-                         diffix.floor_by(pickup_longitude, 0.000244140625) as lon_filter,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
                          substring(pickup_datetime, 1, 10) as date_filter,
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
@@ -354,10 +354,10 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, 0.00048828125),
 AND {commonFilters}
 )
 UNION
-SELECT 0.000244140625::float as lonlatRange, * 
+SELECT {lonlatRange}::float as lonlatRange, * 
                    FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, 0.000244140625) as lat,
-                         diffix.floor_by(pickup_longitude, 0.000244140625) as lon,
+                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
+                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
                           count(*),
                           substring(pickup_datetime, 1, 10) as date,
                           substring(pickup_datetime, 12, 2) as time,
