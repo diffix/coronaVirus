@@ -37,9 +37,9 @@ WHERE {commonFilters};
         self._sqlAdapter.disconnect()
         return buckets
 
-    def piotrEmbarrassingEncounterBuckets(self, lonlatRange):
+    def piotrEmbarrassingEncounterBuckets(self, lonlatRange, lonlatRanges):
         # FIXME really want to look at the result first, I'll un-hardcode later
-        if lonlatRange == 2**-9:
+        if lonlatRange == lonlatRanges[0]:
             sql = f"""
 SELECT {lonlatRange}::float as lonlatRange, * 
                    FROM (SELECT 
@@ -53,7 +53,7 @@ SELECT {lonlatRange}::float as lonlatRange, *
                          GROUP BY 1, 2, 4, 5) x
 WHERE {commonFilters};
 """
-        elif lonlatRange == 2**-10:
+        elif lonlatRange == lonlatRanges[1]:
             sql = f"""
 (SELECT {lonlatRange * 2}::float as lonlatRange, * 
                    FROM (SELECT 
@@ -105,7 +105,7 @@ SELECT {lonlatRange}::float as lonlatRange, *
 WHERE {commonFilters};
 """
 
-        elif lonlatRange == 2**-11:
+        elif lonlatRange == lonlatRanges[2]:
             sql = f"""
 (SELECT {lonlatRange * 4}::float as lonlatRange, * 
                    FROM (SELECT 
@@ -205,7 +205,7 @@ SELECT {lonlatRange}::float as lonlatRange, *
                          GROUP BY 1, 2, 4, 5) x
 WHERE {commonFilters};
 """
-        elif lonlatRange == 2**-12:
+        elif lonlatRange == lonlatRanges[3]:
             sql = f"""
 (SELECT {lonlatRange * 8}::float as lonlatRange, * 
                    FROM (SELECT 

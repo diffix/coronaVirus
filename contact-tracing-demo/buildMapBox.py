@@ -66,8 +66,9 @@ title = "Encounter heatmap of KL"
 cloak = MapBoxCloakAccess()
 
 confLst = list()
-for geoWidth in [2**-9, 2**-10, 2**-11, 2**-12]:
-    buckets = cloak.piotrEmbarrassingEncounterBuckets(geoWidth)
+geoWidths = [2**-9, 2**-10, 2**-11, 2**-12]
+for geoWidth in geoWidths:
+    buckets = cloak.piotrEmbarrassingEncounterBuckets(geoWidth, geoWidths)
     confLst.append(MapBoxCreator.createMap(f"encounters-{geoWidth}", f"Lat/Lng width: {geoWidth}", buckets, geoWidth,
                                            geoWidth))
 
