@@ -292,11 +292,11 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
                             ['linear'],
                             ['get', 'fare_amounts'],
                             0.0, 'rgba(0,0,255,0)',
-                            40.0, 'rgb(65,105,225)',
-                            60.0, 'rgb(0,255,255)',
-                            80.0, 'rgb(0,255,0)',
-                            100.0, 'rgb(255,255,0)',
-                            120.0, 'rgb(255,0,0)'
+                            5.0, 'rgb(65,105,225)',
+                            10.0, 'rgb(0,255,255)',
+                            20.0, 'rgb(0,255,0)',
+                            30.0, 'rgb(255,255,0)',
+                            50.0, 'rgb(255,0,0)'
                         ],
             'fill-opacity': [
                 'interpolate',
