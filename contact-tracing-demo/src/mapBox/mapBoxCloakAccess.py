@@ -3,8 +3,7 @@ import datetime
 from cloakConfig import CloakConfig
 from sql_adapter import SQLAdapter
 
-commonFilters = "lat != 0 AND lon != 0 AND substring(date, 1, 10) = '2013-01-08'"
-commonFiltersFilter = "substring(date_filter, 1, 10) = '2013-01-08'"
+commonFilters = "lat != 0 AND lon != 0"
 
 
 class MapBoxCloakAccess:
@@ -95,7 +94,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                     )
 AND {commonFilters}
 )
@@ -153,7 +152,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 4})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                      UNION
                       SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
                              diffix.floor_by(lon_filter, {lonlatRange * 4}),
@@ -165,7 +164,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 4})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                     )
 AND {commonFilters}
 )
@@ -206,7 +205,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                     )
 AND {commonFilters}
 )
@@ -263,7 +262,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 8})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                      UNION 
                       SELECT diffix.floor_by(lat_filter, {lonlatRange * 8}),
                              diffix.floor_by(lon_filter, {lonlatRange * 8}),
@@ -275,7 +274,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 8})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                      UNION
                       SELECT diffix.floor_by(lat_filter, {lonlatRange * 8}),
                              diffix.floor_by(lon_filter, {lonlatRange * 8}),
@@ -287,7 +286,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 8})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                     )
 AND {commonFilters}
 )
@@ -328,7 +327,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 4})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                      UNION
                      SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
                             diffix.floor_by(lon_filter, {lonlatRange * 4}),
@@ -340,7 +339,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 4})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                     )
 AND {commonFilters}
 )
@@ -381,7 +380,7 @@ WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2})
                          substring(pickup_datetime, 12, 2) as time_filter
                          FROM taxi
                          GROUP BY 1, 2, 3, 4) y
-                        WHERE {commonFiltersFilter}
+                        
                     )
 AND {commonFilters}
 )
