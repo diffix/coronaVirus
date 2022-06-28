@@ -67,8 +67,10 @@ cloak = MapBoxCloakAccess()
 
 confLst = list()
 geoWidths = [2**-8, 2**-9, 2**-10, 2**-11]
+parentBuckets = None
 for geoWidth in geoWidths:
-    buckets = cloak.piotrEmbarrassingEncounterBuckets(geoWidth, geoWidths)
+    buckets = cloak.queryAndStackBuckets(geoWidth, parentBuckets)
+    parentBuckets = buckets
     confLst.append(MapBoxCreator.createMap(f"encounters-{geoWidth}", f"Lat/Lng width: {geoWidth}", buckets, geoWidth,
                                            geoWidth))
 

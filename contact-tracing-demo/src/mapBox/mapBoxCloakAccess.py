@@ -1,4 +1,5 @@
 import datetime
+import copy
 
 from cloakConfig import CloakConfig
 from sql_adapter import SQLAdapter
@@ -8,20 +9,23 @@ class MapBoxCloakAccess:
     def __init__(self):
         self._sqlAdapter = SQLAdapter(CloakConfig.parameters)
 
-    def queryEncounterBuckets(self, lonlatRange, raw=False):
-        sql = f"""
+    def _sql(lonlatRange):
+        return f"""
 SELECT {lonlatRange}::float as lonlatRange, *
                     FROM (SELECT
-                          diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
-                          diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
+                            diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
+                            diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
+                            substring(pickup_datetime, 12, 2) as time,
+                            count(*),
+                            round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
+                            round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
+                            round(avg(fare_amount)::numeric, 2)::float8
                           FROM taxi
                           GROUP BY 1, 2, 3) x;
 """
+
+    def queryEncounterBuckets(self, lonlatRange, raw=False):
+        sql = MapBoxCloakAccess._sql(lonlatRange)
         if raw:
             result = self._sqlAdapter.queryRaw(sql)
         else:
@@ -34,331 +38,40 @@ SELECT {lonlatRange}::float as lonlatRange, *
         self._sqlAdapter.disconnect()
         return buckets
 
-    def piotrEmbarrassingEncounterBuckets(self, lonlatRange, lonlatRanges):
-        # FIXME really want to look at the result first, I'll un-hardcode later
-        if lonlatRange == lonlatRanges[0]:
-            sql = f"""
-SELECT {lonlatRange}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x;
-"""
-        elif lonlatRange == lonlatRanges[1]:
-            sql = f"""
-(SELECT {lonlatRange * 2}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-EXCEPT
-SELECT {lonlatRange * 2}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2}),
-                            diffix.floor_by(lon_filter, {lonlatRange * 2}),
-                            time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                    )
-)
-UNION
-SELECT {lonlatRange}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x;
-"""
-
-        elif lonlatRange == lonlatRanges[2]:
-            sql = f"""
-(SELECT {lonlatRange * 4}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-EXCEPT
-SELECT {lonlatRange * 4}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
-                            diffix.floor_by(lon_filter, {lonlatRange * 4}),
-                            time_filter 
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                     UNION
-                      SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
-                             diffix.floor_by(lon_filter, {lonlatRange * 4}),
-                             time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                    )
-)
-UNION
-(SELECT {lonlatRange * 2}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-EXCEPT
-SELECT {lonlatRange * 2}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2}),
-                            diffix.floor_by(lon_filter, {lonlatRange * 2}),
-                            time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                    )
-)
-UNION
-SELECT {lonlatRange}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x;
-"""
-        elif lonlatRange == lonlatRanges[3]:
-            sql = f"""
-(SELECT {lonlatRange * 8}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 8}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 8}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-EXCEPT
-SELECT {lonlatRange * 8}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 8}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 8}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 8}),
-                            diffix.floor_by(lon_filter, {lonlatRange * 8}),
-                            time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                     UNION 
-                      SELECT diffix.floor_by(lat_filter, {lonlatRange * 8}),
-                             diffix.floor_by(lon_filter, {lonlatRange * 8}),
-                             time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                     UNION
-                      SELECT diffix.floor_by(lat_filter, {lonlatRange * 8}),
-                             diffix.floor_by(lon_filter, {lonlatRange * 8}),
-                             time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                    )
-)
-UNION
-(SELECT {lonlatRange * 4}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-EXCEPT
-SELECT {lonlatRange * 4}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 4}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 4}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
-                            diffix.floor_by(lon_filter, {lonlatRange * 4}),
-                            time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                     UNION
-                     SELECT diffix.floor_by(lat_filter, {lonlatRange * 4}),
-                            diffix.floor_by(lon_filter, {lonlatRange * 4}),
-                            time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                    )
-)
-UNION
-(SELECT {lonlatRange * 2}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-EXCEPT
-SELECT {lonlatRange * 2}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange * 2}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange * 2}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x
-WHERE (lat, lon, time) IN (SELECT diffix.floor_by(lat_filter, {lonlatRange * 2}),
-                            diffix.floor_by(lon_filter, {lonlatRange * 2}),
-                            time_filter
-                        FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat_filter,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon_filter,
-                         substring(pickup_datetime, 12, 2) as time_filter
-                         FROM taxi
-                         GROUP BY 1, 2, 3) y
-                        
-                    )
-)
-UNION
-SELECT {lonlatRange}::float as lonlatRange, * 
-                   FROM (SELECT 
-                         diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
-                         diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
-                          substring(pickup_datetime, 12, 2) as time,
-                          count(*),
-                          round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                          round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                         GROUP BY 1, 2, 3) x;
-"""
+    def queryAndStackBuckets(self, lonlatRange, parentBuckets):
+        sql = MapBoxCloakAccess._sql(lonlatRange)
         result = self._sqlAdapter.queryCloak(sql)
 
         buckets = []
         for row in result:
             buckets.append(_rowToBucket(row))
-        print(f"Loaded {len(result)} anon buckets with range {lonlatRange}.")
+        print(f"Loaded {len(buckets)} anon buckets with range {lonlatRange}.")
+
+        if parentBuckets:
+            bucketsByLatlon = {}
+            for bucket in buckets:
+                bucketsByLatlon[(bucket.lat, bucket.lon, bucket.time)] = True
+
+            for parentBucket in parentBuckets:
+                noChild = True
+                for childLat in [parentBucket.lat, parentBucket.lat + lonlatRange]:
+                    for childLon in [parentBucket.lon, parentBucket.lon + lonlatRange]:
+                        if (childLat, childLon, parentBucket.time) in bucketsByLatlon:
+                            noChild = False
+                if noChild:
+                    buckets.append(parentBucket)
+                else:
+                    for childLat in [parentBucket.lat, parentBucket.lat + lonlatRange]:
+                        for childLon in [parentBucket.lon, parentBucket.lon + lonlatRange]:
+                            if (childLat, childLon, parentBucket.time) not in bucketsByLatlon:
+                                parentBucketCopy = copy.deepcopy(parentBucket)
+                                parentBucketCopy.lat = childLat
+                                parentBucketCopy.lon = childLon
+                                parentBucketCopy.count = None
+                                parentBucketCopy.lonlatRange = lonlatRange
+                                buckets.append(parentBucketCopy)
+
+        print(f"Combined with parents: {len(buckets)} anon buckets with range {lonlatRange}.")
         self._sqlAdapter.disconnect()
         return buckets
 
