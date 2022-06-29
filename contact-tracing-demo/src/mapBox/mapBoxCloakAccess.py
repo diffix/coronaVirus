@@ -56,14 +56,14 @@ def _putBucket(bucketsByLatlon, bucket):
     bucketsByLatlon[(bucket.lat, bucket.lon, bucket.time)] = bucket.fareAmounts
 
 
-def _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon):
+def _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon, fillWithSplitBuckets=False):
 
     noChild = not _hasChild(parentBucket, lonlatRange, bucketsByLatlon)
     if noChild:
         # at this level, the parent has no children whatsoever - we plant the parent and we're done
         buckets.append(parentBucket)
         _putBucket(bucketsByLatlon, parentBucket)
-    else:
+    elif fillWithSplitBuckets:
         # parentBuckets might include "grandparents" of the current generation. In such cases, we still might use the intermediate
         # generations, in case where current generation doesn't appear in the intermediate generation level tiles.
         if parentBucket.lonlatRange > lonlatRange * 2:
@@ -96,6 +96,8 @@ def _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon):
                             parentBucketCopy = _copyAndSetLonlat(parentBucket, childLat, childLon, lonlatRange)
                             buckets.append(parentBucketCopy)
                             _putBucket(bucketsByLatlon, parentBucketCopy)
+    else:
+        pass
 
 
 class MapBoxCloakAccess:
