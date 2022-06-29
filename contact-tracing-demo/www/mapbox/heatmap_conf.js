@@ -239,10 +239,12 @@ function initializePage(parsed) {
     });
     const container = '#comparison-container';
     // FIXME swapped because we want anonymous on the right. Rename things and fix this
-    new mapboxgl.Compare(map2, map, container, {
-    // Set this to enable comparing two maps by mouse movement:
-    // mousemove: true
-    });
+    new mapboxgl.Compare(map2, map, container, {});
+
+    // This adds the +/- zoom thingy. Adding in both maps, to not have to figure out how to block the slider from
+    // running over it.
+    map.addControl(new mapboxgl.NavigationControl());
+    map2.addControl(new mapboxgl.NavigationControl());
 }
 
 function prepareMap() {
