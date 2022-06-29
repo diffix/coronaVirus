@@ -25,10 +25,20 @@ def _lonlatSteps(start, parentRange, childRange):
     nSteps = round(parentRange / childRange)
     return [start + i * childRange for i in range(0, nSteps)]
 
-def _hasChild(startLat, startLon, parentRange, parentTime, childRange, bucketsByLatlon):
-    for childLat in _lonlatSteps(startLat, parentRange, childRange):
-        for childLon in _lonlatSteps(startLon, parentRange, childRange):
-            if (childLat, childLon, parentTime) in bucketsByLatlon:
+# Returns True if the parent bucket as a child with a different value.
+def _hasDistinctChild(parentBucket, childRange, bucketsByLatlon):
+    for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, childRange):
+        for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, childRange):
+            childValue = dict.get(bucketsByLatlon, (childLat, childLon, parentBucket.time))
+            if childValue and childValue != parentBucket.fareAmounts:
+                return True
+    return False
+
+# Returns True if the parent bucket as any child at all.
+def _hasChild(parentBucket, childRange, bucketsByLatlon):
+    for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, childRange):
+        for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, childRange):
+            if (childLat, childLon, parentBucket.time) in bucketsByLatlon:
                 return True
     return False
 
@@ -41,14 +51,17 @@ def _copyAndSetLonlat(bucket, lat, lon, lonlatRange):
     return parentBucketCopy
 
 
+def _putBucket(bucketsByLatlon, bucket):
+    bucketsByLatlon[(bucket.lat, bucket.lon, bucket.time)] = bucket.fareAmounts
+
 
 def _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon):
 
-    noChild = not _hasChild(parentBucket.lat, parentBucket.lon, parentBucket.lonlatRange, parentBucket.time, lonlatRange, bucketsByLatlon)
+    noChild = not _hasChild(parentBucket, lonlatRange, bucketsByLatlon)
     if noChild:
         # at this level, the parent has no children whatsoever - we plant the parent and we're done
         buckets.append(parentBucket)
-        bucketsByLatlon[(parentBucket.lat, parentBucket.lon, parentBucket.time)] = True
+        _putBucket(bucketsByLatlon, parentBucket)
     else:
         # parentBuckets might include "grandparents" of the current generation. In such cases, we still might use the intermediate
         # generations, in case where current generation doesn't appear in the intermediate generation level tiles.
@@ -64,13 +77,24 @@ def _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon):
             for immediateChild in immediateChildren:
                 _appendParentBucket(immediateChild, lonlatRange, buckets, bucketsByLatlon)
         else:
-            # finally we handle at the level of the "finest" ancestors
-            for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, lonlatRange):
-                for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, lonlatRange):
-                    if (childLat, childLon, parentBucket.time) not in bucketsByLatlon:
-                        parentBucketCopy = _copyAndSetLonlat(parentBucket, childLat, childLon, lonlatRange)
-                        buckets.append(parentBucketCopy)
-                        bucketsByLatlon[(childLat, childLon, parentBucketCopy.time)] = True
+            # Finally we handle at the level of the "finest" ancestors.
+            # Handle the special case, where the child that is there is just exactly the same as we're about to fill with.
+            # In such case, we prefer to not fill with the parent bucket data, concluding that the parent data is just coming from
+            # this single child in 100%
+            # NOTE that this only happens in the raw, non-anonymized data. In anonymized data we have noise dependant on the resolution
+            # of generalization, so it's unlikely to get a child value exact same as parent's.
+            noDistinctChild = not _hasDistinctChild(parentBucket, lonlatRange, bucketsByLatlon)
+            if noDistinctChild:
+                # leave things as they are
+                pass
+            else:
+                # fill the missing buckets with parent data
+                for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, lonlatRange):
+                    for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, lonlatRange):
+                        if (childLat, childLon, parentBucket.time) not in bucketsByLatlon:
+                            parentBucketCopy = _copyAndSetLonlat(parentBucket, childLat, childLon, lonlatRange)
+                            buckets.append(parentBucketCopy)
+                            _putBucket(bucketsByLatlon, parentBucketCopy)
 
 
 class MapBoxCloakAccess:
@@ -92,7 +116,7 @@ class MapBoxCloakAccess:
         if parentBuckets:
             bucketsByLatlon = {}
             for bucket in buckets:
-                bucketsByLatlon[(bucket.lat, bucket.lon, bucket.time)] = True
+                _putBucket(bucketsByLatlon, bucket)
 
             for parentBucket in parentBuckets:
                 _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon)
