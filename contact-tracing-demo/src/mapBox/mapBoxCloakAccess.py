@@ -14,11 +14,12 @@ SELECT {lonlatRange}::float as lonlatRange, *
                             count(*),
                             round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
                             round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                            round(avg(fare_amount)::numeric, 2)::float8
+                            round(avg(fare_amount)::numeric, 2)::float8 as avg
                             FROM taxi
-                            GROUP BY 1, 2, 3
-                            HAVING count(*) >= {countThresh}) x
-WHERE time::integer % 4 = 0;
+                            GROUP BY 1, 2, 3) x
+WHERE time::integer % 4 = 0 AND
+      count >= {countThresh} AND
+      avg IS NOT NULL;
 """
 
 def _lonlatSteps(start, parentRange, childRange):
