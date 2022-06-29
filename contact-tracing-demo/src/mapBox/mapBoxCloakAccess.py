@@ -25,6 +25,53 @@ def _lonlatSteps(start, parentRange, childRange):
     nSteps = round(parentRange / childRange)
     return [start + i * childRange for i in range(0, nSteps)]
 
+def _hasChild(startLat, startLon, parentRange, parentTime, childRange, bucketsByLatlon):
+    for childLat in _lonlatSteps(startLat, parentRange, childRange):
+        for childLon in _lonlatSteps(startLon, parentRange, childRange):
+            if (childLat, childLon, parentTime) in bucketsByLatlon:
+                return True
+    return False
+
+def _copyAndSetLonlat(bucket, lat, lon, lonlatRange):
+    parentBucketCopy = copy.deepcopy(bucket)
+    parentBucketCopy.lat = lat
+    parentBucketCopy.lon = lon
+    parentBucketCopy.count = None
+    parentBucketCopy.lonlatRange = lonlatRange
+    return parentBucketCopy
+
+
+
+def _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon):
+
+    noChild = not _hasChild(parentBucket.lat, parentBucket.lon, parentBucket.lonlatRange, parentBucket.time, lonlatRange, bucketsByLatlon)
+    if noChild:
+        # at this level, the parent has no children whatsoever - we plant the parent and we're done
+        buckets.append(parentBucket)
+        bucketsByLatlon[(parentBucket.lat, parentBucket.lon, parentBucket.time)] = True
+    else:
+        # parentBuckets might include "grandparents" of the current generation. In such cases, we still might use the intermediate
+        # generations, in case where current generation doesn't appear in the intermediate generation level tiles.
+        if parentBucket.lonlatRange > lonlatRange * 2:
+            # before we use the children from the current level, let's try an intermediate level
+            # First, split the parent into immediate children:
+            immediateChildLonlatRange = parentBucket.lonlatRange / 2
+            immediateChildren = [_copyAndSetLonlat(parentBucket, lat, lon, immediateChildLonlatRange) for lat, lon in
+                                [(parentBucket.lat, parentBucket.lon),
+                                (parentBucket.lat + immediateChildLonlatRange, parentBucket.lon),
+                                (parentBucket.lat, parentBucket.lon + immediateChildLonlatRange),
+                                (parentBucket.lat + immediateChildLonlatRange, parentBucket.lon + immediateChildLonlatRange)]]
+            for immediateChild in immediateChildren:
+                _appendParentBucket(immediateChild, lonlatRange, buckets, bucketsByLatlon)
+        else:
+            # finally we handle at the level of the "finest" ancestors
+            for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, lonlatRange):
+                for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, lonlatRange):
+                    if (childLat, childLon, parentBucket.time) not in bucketsByLatlon:
+                        parentBucketCopy = _copyAndSetLonlat(parentBucket, childLat, childLon, lonlatRange)
+                        buckets.append(parentBucketCopy)
+                        bucketsByLatlon[(childLat, childLon, parentBucketCopy.time)] = True
+
 
 class MapBoxCloakAccess:
     def __init__(self):
@@ -48,23 +95,7 @@ class MapBoxCloakAccess:
                 bucketsByLatlon[(bucket.lat, bucket.lon, bucket.time)] = True
 
             for parentBucket in parentBuckets:
-                noChild = True
-                for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, lonlatRange):
-                    for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, lonlatRange):
-                        if (childLat, childLon, parentBucket.time) in bucketsByLatlon:
-                            noChild = False
-                if noChild:
-                    buckets.append(parentBucket)
-                else:
-                    for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, lonlatRange):
-                        for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, lonlatRange):
-                            if (childLat, childLon, parentBucket.time) not in bucketsByLatlon:
-                                parentBucketCopy = copy.deepcopy(parentBucket)
-                                parentBucketCopy.lat = childLat
-                                parentBucketCopy.lon = childLon
-                                parentBucketCopy.count = None
-                                parentBucketCopy.lonlatRange = lonlatRange
-                                buckets.append(parentBucketCopy)
+                _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon)
 
         print(f"Combined with parents: {len(buckets)} {'raw' if raw else 'anon'} buckets with range {lonlatRange}.")
         self._sqlAdapter.disconnect()
