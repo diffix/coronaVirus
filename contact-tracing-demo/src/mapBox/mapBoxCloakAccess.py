@@ -4,13 +4,8 @@ import copy
 from cloakConfig import CloakConfig
 from sql_adapter import SQLAdapter
 
-
-class MapBoxCloakAccess:
-    def __init__(self):
-        self._sqlAdapter = SQLAdapter(CloakConfig.parameters)
-
-    def _sql(lonlatRange):
-        return f"""
+def _sql(lonlatRange, countThresh=0):
+    return f"""
 SELECT {lonlatRange}::float as lonlatRange, *
                     FROM (SELECT
                             diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
@@ -20,12 +15,23 @@ SELECT {lonlatRange}::float as lonlatRange, *
                             round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
                             round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
                             round(avg(fare_amount)::numeric, 2)::float8
-                          FROM taxi
-                          GROUP BY 1, 2, 3) x;
+                            FROM taxi
+                            GROUP BY 1, 2, 3
+                            HAVING count(*) >= {countThresh}) x
+WHERE time::integer % 4 = 0;
 """
 
-    def queryEncounterBuckets(self, lonlatRange, raw=False):
-        sql = MapBoxCloakAccess._sql(lonlatRange)
+def _lonlatSteps(start, parentRange, childRange):
+    nSteps = round(parentRange / childRange)
+    return [start + i * childRange for i in range(0, nSteps)]
+
+
+class MapBoxCloakAccess:
+    def __init__(self):
+        self._sqlAdapter = SQLAdapter(CloakConfig.parameters)
+
+    def queryAndStackBuckets(self, lonlatRange, parentBuckets, raw=False):
+        sql = _sql(lonlatRange, countThresh=5 if raw else 0)
         if raw:
             result = self._sqlAdapter.queryRaw(sql)
         else:
@@ -34,18 +40,7 @@ SELECT {lonlatRange}::float as lonlatRange, *
         buckets = []
         for row in result:
             buckets.append(_rowToBucket(row))
-        print(f"Loaded {len(result)} raw buckets with range {lonlatRange}.")
-        self._sqlAdapter.disconnect()
-        return buckets
-
-    def queryAndStackBuckets(self, lonlatRange, parentBuckets):
-        sql = MapBoxCloakAccess._sql(lonlatRange)
-        result = self._sqlAdapter.queryCloak(sql)
-
-        buckets = []
-        for row in result:
-            buckets.append(_rowToBucket(row))
-        print(f"Loaded {len(buckets)} anon buckets with range {lonlatRange}.")
+        print(f"Loaded {len(buckets)} {'raw' if raw else 'anon'} buckets with range {lonlatRange}.")
 
         if parentBuckets:
             bucketsByLatlon = {}
@@ -54,15 +49,15 @@ SELECT {lonlatRange}::float as lonlatRange, *
 
             for parentBucket in parentBuckets:
                 noChild = True
-                for childLat in [parentBucket.lat, parentBucket.lat + lonlatRange]:
-                    for childLon in [parentBucket.lon, parentBucket.lon + lonlatRange]:
+                for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, lonlatRange):
+                    for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, lonlatRange):
                         if (childLat, childLon, parentBucket.time) in bucketsByLatlon:
                             noChild = False
                 if noChild:
                     buckets.append(parentBucket)
                 else:
-                    for childLat in [parentBucket.lat, parentBucket.lat + lonlatRange]:
-                        for childLon in [parentBucket.lon, parentBucket.lon + lonlatRange]:
+                    for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, lonlatRange):
+                        for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, lonlatRange):
                             if (childLat, childLon, parentBucket.time) not in bucketsByLatlon:
                                 parentBucketCopy = copy.deepcopy(parentBucket)
                                 parentBucketCopy.lat = childLat
@@ -71,7 +66,7 @@ SELECT {lonlatRange}::float as lonlatRange, *
                                 parentBucketCopy.lonlatRange = lonlatRange
                                 buckets.append(parentBucketCopy)
 
-        print(f"Combined with parents: {len(buckets)} anon buckets with range {lonlatRange}.")
+        print(f"Combined with parents: {len(buckets)} {'raw' if raw else 'anon'} buckets with range {lonlatRange}.")
         self._sqlAdapter.disconnect()
         return buckets
 

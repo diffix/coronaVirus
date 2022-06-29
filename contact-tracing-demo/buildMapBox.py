@@ -67,15 +67,17 @@ cloak = MapBoxCloakAccess()
 
 confLst = list()
 geoWidths = [2**-8, 2**-9, 2**-10, 2**-11]
-parentBuckets = None
+parentAnonBuckets = None
+parentRawBuckets = None
 for geoWidth in geoWidths:
-    buckets = cloak.queryAndStackBuckets(geoWidth, parentBuckets)
-    parentBuckets = buckets
-    confLst.append(MapBoxCreator.createMap(f"encounters-{geoWidth}", f"Lat/Lng width: {geoWidth}", buckets, geoWidth,
+    anonBuckets = cloak.queryAndStackBuckets(geoWidth, parentAnonBuckets)
+    parentAnonBuckets = anonBuckets
+    confLst.append(MapBoxCreator.createMap(f"encounters-{geoWidth}", f"Lat/Lng width: {geoWidth}", anonBuckets, geoWidth,
                                            geoWidth))
 
-    buckets = cloak.queryEncounterBuckets(geoWidth, raw=True)
-    confLst.append(MapBoxCreator.createMap(f"encounters-raw-{geoWidth}", f"Non-anonymized data", buckets, geoWidth, geoWidth, raw=True))
+    rawBuckets = cloak.queryAndStackBuckets(geoWidth, parentRawBuckets, raw=True)
+    parentRawBuckets = rawBuckets
+    confLst.append(MapBoxCreator.createMap(f"encounters-raw-{geoWidth}", f"Non-anonymized data", rawBuckets, geoWidth, geoWidth, raw=True))
 conf = MapBoxCreator.createMergedMap('encounters', title, confLst)
 
 MapBoxCreator.printLinks('Local', title, confLst, conf)
