@@ -49,21 +49,25 @@ function updateDataSet() {
     }
 }
 
+const mapboxStyleUrl = 'mapbox://styles/mapbox/light-v10';
+const startCenter = [-73.935242, 40.730610];
+const startZoom = 13;
+
 function initializePage(parsed) {
     conf = parsed;
     const startSeconds = conf.startSeconds;
     mapboxgl.accessToken = conf.accessToken;
     map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/outdoors-v11',
-        center: [-73.935242, 40.730610],
-        zoom: 13
+        style: mapboxStyleUrl,
+        center: startCenter,
+        zoom: startZoom
     });
     map2 = new mapboxgl.Map({
         container: 'map2',
-        style: 'mapbox://styles/mapbox/outdoors-v11',
-        center: [-73.935242, 40.730610],
-        zoom: 13
+        style: mapboxStyleUrl,
+        center: startCenter,
+        zoom: startZoom
     });
     map2.on('load', function () {
         prepareMap();
@@ -104,6 +108,22 @@ function prepareMap() {
     }
 }
 
+/*
+ * The average fare and speed to gauge the colors with:
+ * prop_test=# SELECT avg(fare_amount) FROM taxi;
+ *         avg         
+ * --------------------
+ *  11.566858325464596
+ * (1 row)
+ * 
+ * prop_test=# SELECT sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600 FROM taxi;
+ *       ?column?      
+ * --------------------
+ *  14.613886791653774
+ * (1 row)
+ */
+const [colorHighest, colorAvg, colorLowest] = ['#f1a340','#f7f7f7','#998ec3'];
+
 function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
     const geoWidth = parseFloat(dataSetConf.geoWidth);
     const zoomOffset = Math.log2(geoWidth / 0.0001).toFixed(1); // ~2-5
@@ -137,21 +157,18 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
                             'interpolate',
                             ['linear'],
                             ['get', 'fare_amounts'],
-                            0.0, 'rgba(0,0,255,0)',
-                            5.0, 'rgb(65,105,225)',
-                            10.0, 'rgb(0,255,255)',
-                            20.0, 'rgb(0,255,0)',
-                            35.0, 'rgb(255,255,0)',
-                            55.0, 'rgb(255,0,0)'
+                            0.0, colorLowest,
+                            11.6, colorAvg,
+                            70.0, colorHighest
                         ],
             'fill-opacity': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
                 10, 0,
-                11, 0.6,
-                15.5, 0.6,
-                16.5, 0.4
+                11, 0.8,
+                15.5, 0.8,
+                16.5, 0.6
             ],
             'fill-outline-color': 'rgba(255,255,255,0)'
         }
@@ -201,21 +218,18 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
                             'interpolate',
                             ['linear'],
                             ['get', 'trip_speed'],
-                            0.0, 'rgba(0,0,255,0)',
-                            10.0, 'rgb(65,105,225)',
-                            15.0, 'rgb(0,255,255)',
-                            20.0, 'rgb(0,255,0)',
-                            30.0, 'rgb(255,255,0)',
-                            40.0, 'rgb(255,0,0)'
+                            0.0, colorLowest,
+                            14.6, colorAvg,
+                            40.0, colorHighest
                         ],
             'fill-opacity': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
                 10, 0,
-                11, 0.6,
-                15.5, 0.6,
-                16.5, 0.4
+                11, 0.8,
+                15.5, 0.8,
+                16.5, 0.6
             ],
             'fill-outline-color': 'rgba(255,255,255,0)'
         }
