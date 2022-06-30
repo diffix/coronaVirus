@@ -48,23 +48,19 @@
 </div>
 <div class="map-overlay-top">
     <div class="map-overlay-inner">
-        <h2 id="title">Loading ...</h2>
-        <h3 id="subtitle">Loading ...</h3>
-        <!-- <p>
-            <label id="dataSet" for="dsSlider">Loading ...</label>
-            <input class="slider" id="dsSlider" type="range" min="0" max="7" step="1" value="0"/>
-        </p> -->
+        <h2 id="title">NYC taxi trip data heatmap</h2>
         <p>
-            <!-- <label id="date" for="dSlider">Loading ...</label>
-            <input class="slider" id="dSlider" type="range" min="0" max="7" step="1" value="0"/> -->
+            <input type="radio" id="pdRadioFareAmounts" value="fareAmounts" name="pdRadio" checked="true">
+            <label>Average trip fare [$]</label>
+        </p>
+        <p>
+            <input type="radio" id="pdRadioTripSpeed" value="tripSpeed" name="pdRadio">
+            <label>Average trip speed [mph]</label>
+        </p>
+        <p>
             <label id="time" for="tSlider">Loading ...</label>
             <input class="slider" id="tSlider" type="range" min="0" max="23" step="1" value="0"/>
         </p>
-        <!-- <p>
-            <label id="animationSpeed" for="asSlider">Animation step every: 0.5s</label>
-            <input class="slider" id="asSlider" type="range" min="1" max="11" step="1" value="1"/>
-            <button id="animationButton" type="button">Start Animation</button>
-        </p> -->
     </div>
 </div>
 <div class="map-overlay-bottom">

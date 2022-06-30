@@ -1,130 +1,52 @@
-// function startAnimation() {
-//     if (timer !== null) {
-//         clearInterval(timer);
-//     }
-//     document.getElementById('animationButton').textContent = "Stop Animation";
-//     const timeout = parseInt(document.getElementById('asSlider').value, 10) * 500;
-//     timer = setInterval(doAnimation, timeout);
-// }
-
-// function stopAnimation() {
-//     if (timer === null) {
-//         return;
-//     }
-//     clearInterval(timer);
-//     timer = null;
-//     document.getElementById('animationButton').textContent = "Start Animation";
-// }
-
-// function updateAnimation() {
-//     if (timer === null) {
-//         return;
-//     }
-//     startAnimation();
-// }
-
-// function toggleAnimation() {
-//     if (timer === null) {
-//         startAnimation();
-//     } else {
-//         stopAnimation();
-//     }
-// }
-
-// function doAnimation() {
-//     if (!incrementAnimation()) {
-//         stopAnimation();
-//     }
-// }
-
-// function incrementAnimation() {
-//     let tSlider = document.getElementById('tSlider');
-//     if (parseInt(tSlider.value, 10) < parseInt(tSlider.max, 10)) {
-//         tSlider.stepUp();
-//         updateFilter();
-//         return true;
-//     } else {
-//         let dSlider = document.getElementById('dSlider');
-//         if (parseInt(dSlider.value, 10) < parseInt(dSlider.max, 10)) {
-//             tSlider.value = tSlider.min;
-//             dSlider.stepUp();
-//             updateFilter();
-//             return true;
-//         } else {
-//             return false;
-//         }
-//     }
-// }
-
 function updateFilter() {
     const tChoice = parseInt(document.getElementById('tSlider').value, 10);
-    // const dChoice = parseInt(document.getElementById('dSlider').value, 10);
-    const dChoice = 0;
-    filterBy(startSeconds + dChoice * 86400 + tChoice * 3600);
+    filterBy(startSeconds + tChoice * 3600);
 }
 
 function filterBy(seconds) {
     let filters = ['==', 'time', seconds];
 
     for (dataSetConf of conf.dataSets) {
-        // FIXME map vs map2
-        if (dataSetConf.isRaw) {
-            map2.setFilter(dataSetConf.name + '-heatRectangles', filters);
-            map2.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
-            map2.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
-        } else {
-            map.setFilter(dataSetConf.name + '-heatRectangles', filters);
-            map.setFilter(dataSetConf.name + '-cloakDataRectangles', filters);
-            map.setFilter(dataSetConf.name + '-cloakDataCounts', filters);
-        }
+        const mapElement = dataSetConf.isRaw ? map2 : map
+        mapElement.setFilter(dataSetConf.name + '-heatRectangles-fareAmounts', filters);
+        mapElement.setFilter(dataSetConf.name + '-heatRectangles-tripSpeed', filters);
+        mapElement.setFilter(dataSetConf.name + '-values-fareAmounts', filters);
+        mapElement.setFilter(dataSetConf.name + '-values-tripSpeed', filters);
+        mapElement.setFilter(dataSetConf.name + '-rectangles', filters);
     }
     let date = new Date(seconds * 1000)
-    // document.getElementById('date').textContent = 'Date: ' + date.toLocaleDateString();
     const time = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
     document.getElementById('time').textContent = 'Time: ' + time;
 }
 
-function updateDataSet() {
-    for (dataSetConf of conf.dataSets) {
-        // FIXME map vs map2
-        if (dataSetConf.isRaw) {
-            map2.setLayoutProperty(dataSetConf.name + '-heatRectangles', 'visibility', 'visible');
-            map2.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
-            map2.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
-        } else {
-            map.setLayoutProperty(dataSetConf.name + '-heatRectangles', 'visibility', 'visible');
-            map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
-            map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
+function getValuePlottedData() {
+    const radioButtons = document.querySelectorAll('input[name="pdRadio"]');
+    let valuePlottedData;
+    for (const radioButton of radioButtons) {
+        if (radioButton.checked) {
+            valuePlottedData = radioButton.value;
+            break;
         }
     }
+    return valuePlottedData
+}
 
-    //
-    // selective version
-    //
-    // const index = parseInt(document.getElementById('dsSlider').value, 10);
-    // if (currentDataSet !== index) {
-    //     if (0 <= currentDataSet && currentDataSet < conf.dataSets.length) {
-    //         let dataSetConf = conf.dataSets[currentDataSet];
-    //         map.setLayoutProperty(dataSetConf.name + '-heatRectangles', 'visibility', 'none');
-    //         map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'none');
-    //         map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'none');
-    //     }
-    //     currentDataSet = index;
-    //     if (conf.dataSets.length - 1 < index) {
-    //         document.getElementById('subtitle').textContent = "No dataset selected";
-    //         document.getElementById('dataSet').textContent = "Dataset: None";
-    //         return;
-    //     }
-    // }
-    // dataSetConf = conf.dataSets[index];
-    
-    // // FIXME move
-    // map.setLayoutProperty(dataSetConf.name + '-heatRectangles', 'visibility', 'visible');
-    // map.setLayoutProperty(dataSetConf.name + '-cloakDataRectangles', 'visibility', 'visible');
-    // map.setLayoutProperty(dataSetConf.name + '-cloakDataCounts', 'visibility', 'visible');
+function updateDataSet() {
+    for (dataSetConf of conf.dataSets) {
+        const layerSuffixes = ['heatRectangles-fareAmounts', 'heatRectangles-tripSpeed',
+                               'values-fareAmounts', 'values-tripSpeed',
+                               'rectangles' ]
+        const mapElement = dataSetConf.isRaw ? map2 : map
+        layerSuffixes.forEach((layerSuffix) => {
+            mapElement.setLayoutProperty(dataSetConf.name + '-' + layerSuffix, 'visibility', 'none')
+        });
 
-    // document.getElementById('subtitle').textContent = dataSetConf.subtitle;
-    // document.getElementById('dataSet').textContent = "Dataset: " + dataSetConf.name;
+        const valuePlottedData = getValuePlottedData()
+        mapElement.setLayoutProperty(dataSetConf.name + '-heatRectangles-' + valuePlottedData, 'visibility', 'visible');
+        mapElement.setLayoutProperty(dataSetConf.name + '-values-' + valuePlottedData, 'visibility', 'visible');
+
+        mapElement.setLayoutProperty(dataSetConf.name + '-rectangles', 'visibility', 'visible');
+    }
 }
 
 function initializePage(parsed) {
@@ -137,52 +59,6 @@ function initializePage(parsed) {
         center: [-73.935242, 40.730610],
         zoom: 13
     });
-    map.on('load', function () {
-        prepareMap();
-        filterBy(startSeconds);
-        dsCount = 1 < conf.dataSets.length ? conf.dataSets.length - 1 : 1;
-        // document.getElementById('dsSlider').max = dsCount;
-        // if (initialDataSet < 0 || conf.dataSets.length - 1 < initialDataSet) {
-        //     console.log("Only " + conf.dataSets.length + " datasets configured. No dataset with index " +
-        //         initialDataSet + " present. Displaying dataset with index 0.")
-        //     document.getElementById('dsSlider').value = 0;
-        // } else {
-        //     document.getElementById('dsSlider').value = initialDataSet;
-        // }
-        updateDataSet();
-        document.title = conf.title;
-        // document.getElementById('title').textContent = conf.title;
-        // document
-        //     .getElementById('dsSlider')
-        //     .addEventListener('input', function () {
-        //         updateDataSet();
-        //     });
-        document
-            .getElementById('tSlider')
-            .addEventListener('input', function () {
-                updateFilter();
-            });
-        // document
-        //     .getElementById('dSlider')
-        //     .addEventListener('input', function () {
-        //         updateFilter();
-        //     });
-        // document
-        //     .getElementById('asSlider')
-        //     .addEventListener('input', function (e) {
-        //         let asChoice = parseInt(e.target.value, 10) - 1;
-        //         if (asChoice === 0) {
-        //             asChoice = 0.5;
-        //         }
-        //         document.getElementById('animationSpeed').textContent = "Animation step every: " + asChoice + "s"
-        //         updateAnimation();
-        //     });
-        // document
-        //     .getElementById('animationButton')
-        //     .addEventListener('click', function () {
-        //         toggleAnimation();
-        //     });
-    });
     map2 = new mapboxgl.Map({
         container: 'map2',
         style: 'mapbox://styles/mapbox/outdoors-v11',
@@ -190,52 +66,20 @@ function initializePage(parsed) {
         zoom: 13
     });
     map2.on('load', function () {
+        prepareMap();
         filterBy(startSeconds);
-        dsCount = 1 < conf.dataSets.length ? conf.dataSets.length - 1 : 1;
-        // document.getElementById('dsSlider').max = dsCount;
-        // if (initialDataSet < 0 || conf.dataSets.length - 1 < initialDataSet) {
-        //     console.log("Only " + conf.dataSets.length + " datasets configured. No dataset with index " +
-        //         initialDataSet + " present. Displaying dataset with index 0.")
-        //     document.getElementById('dsSlider').value = 0;
-        // } else {
-        //     document.getElementById('dsSlider').value = initialDataSet;
-        // }
         updateDataSet();
         document.title = conf.title;
-        // document.getElementById('title').textContent = conf.title;
-        // document
-        //     .getElementById('dsSlider')
-        //     .addEventListener('input', function () {
-        //         updateDataSet();
-        //     });
         document
             .getElementById('tSlider')
             .addEventListener('input', function () {
                 updateFilter();
             });
-        // document
-        //     .getElementById('dSlider')
-        //     .addEventListener('input', function () {
-        //         updateFilter();
-        //     });
-        // document
-        //     .getElementById('asSlider')
-        //     .addEventListener('input', function (e) {
-        //         let asChoice = parseInt(e.target.value, 10) - 1;
-        //         if (asChoice === 0) {
-        //             asChoice = 0.5;
-        //         }
-        //         document.getElementById('animationSpeed').textContent = "Animation step every: " + asChoice + "s"
-        //         updateAnimation();
-        //     });
-        // document
-        //     .getElementById('animationButton')
-        //     .addEventListener('click', function () {
-        //         toggleAnimation();
-        //     });
-    });
-    map.on('idle', function () {
-        console.log(map.getZoom());
+        document
+            .querySelectorAll('input[name="pdRadio"]')
+            .forEach((radioButton) => radioButton.addEventListener('input', function () {
+                updateDataSet();
+            }));
     });
     const container = '#comparison-container';
     // FIXME swapped because we want anonymous on the right. Rename things and fix this
@@ -266,7 +110,7 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
     const minZoomHeatmap = (geoWidth == maxGeoWidth ? 10 : 17.5 - zoomOffset);
     const minZoom = 17.5 - zoomOffset;
     const maxZoom = (geoWidth == minGeoWidth) ? 20 : 17.5 - zoomOffset + 1;
-    console.log(dataSetConf.name, minZoom, maxZoom);
+    
     mapElement.addSource(dataSetConf.name + '-polygons', {
         type: 'geojson',
         data: dataSetConf.polygonsFileRelativePath,
@@ -280,7 +124,7 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
         buffer: 2
     });
     mapElement.addLayer({
-        id: dataSetConf.name + '-heatRectangles',
+        id: dataSetConf.name + '-heatRectangles-fareAmounts',
         type: 'fill',
         source: dataSetConf.name + '-polygons',
         minzoom: minZoomHeatmap,
@@ -297,8 +141,8 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
                             5.0, 'rgb(65,105,225)',
                             10.0, 'rgb(0,255,255)',
                             20.0, 'rgb(0,255,0)',
-                            30.0, 'rgb(255,255,0)',
-                            50.0, 'rgb(255,0,0)'
+                            35.0, 'rgb(255,255,0)',
+                            55.0, 'rgb(255,0,0)'
                         ],
             'fill-opacity': [
                 'interpolate',
@@ -313,28 +157,7 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
         }
     }, 'waterway-label');
     mapElement.addLayer({
-        id: dataSetConf.name + '-cloakDataRectangles',
-        type: 'fill',
-        source: dataSetConf.name + '-polygons',
-        minzoom: minZoom,
-        maxzoom: maxZoom,
-        layout: {
-            'visibility': 'none'
-        },
-        paint: {
-            'fill-color': 'rgba(255,255,255,0)',
-            'fill-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                15.5 - zoomOffset, 0,
-                16 - zoomOffset, 0.1
-            ],
-            'fill-outline-color': 'rgb(0,0,0)'
-        }
-    }, 'waterway-label');
-    mapElement.addLayer({
-        id: dataSetConf.name + '-cloakDataCounts',
+        id: dataSetConf.name + '-values-fareAmounts',
         type: 'symbol',
         source: dataSetConf.name + '-centers',
         minzoom: minZoom,
@@ -364,6 +187,91 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
             ]
         }
     });
+    mapElement.addLayer({
+        id: dataSetConf.name + '-heatRectangles-tripSpeed',
+        type: 'fill',
+        source: dataSetConf.name + '-polygons',
+        minzoom: minZoomHeatmap,
+        maxzoom: maxZoom,
+        layout: {
+            'visibility': 'none'
+        },
+        paint: {
+            'fill-color': [
+                            'interpolate',
+                            ['linear'],
+                            ['get', 'trip_speed'],
+                            0.0, 'rgba(0,0,255,0)',
+                            10.0, 'rgb(65,105,225)',
+                            15.0, 'rgb(0,255,255)',
+                            20.0, 'rgb(0,255,0)',
+                            30.0, 'rgb(255,255,0)',
+                            40.0, 'rgb(255,0,0)'
+                        ],
+            'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                10, 0,
+                11, 0.6,
+                15.5, 0.6,
+                16.5, 0.4
+            ],
+            'fill-outline-color': 'rgba(255,255,255,0)'
+        }
+    }, 'waterway-label');
+    mapElement.addLayer({
+        id: dataSetConf.name + '-values-tripSpeed',
+        type: 'symbol',
+        source: dataSetConf.name + '-centers',
+        minzoom: minZoom,
+        maxzoom: maxZoom,
+        layout: {
+            'visibility': 'none',
+            'text-allow-overlap': true,
+            'text-ignore-placement': true,
+            'text-field': ['to-string', ['get', 'trip_speed']],
+            'text-size': [
+                'interpolate',
+                ['exponential', 1.99],
+                ['zoom'],
+                0, 1,
+                22, Math.round(1750000 * geoWidth)
+            ]
+        },
+        paint: {
+            'text-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                16.5 - zoomOffset, 0,
+                17 - zoomOffset, 0.4,
+                21.5 - zoomOffset, 0.4,
+                22 - zoomOffset, 0
+            ]
+        }
+    });
+    mapElement.addLayer({
+        id: dataSetConf.name + '-rectangles',
+        type: 'fill',
+        source: dataSetConf.name + '-polygons',
+        minzoom: minZoom,
+        maxzoom: maxZoom,
+        layout: {
+            'visibility': 'none'
+        },
+        paint: {
+            'fill-color': 'rgba(255,255,255,0)',
+            'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                15.5 - zoomOffset, 0,
+                16 - zoomOffset, 0.1
+            ],
+            'fill-outline-color': 'rgb(0,0,0)'
+        }
+    }, 'waterway-label');
 }
 
 const urlParams = new URLSearchParams(window.location.search);
