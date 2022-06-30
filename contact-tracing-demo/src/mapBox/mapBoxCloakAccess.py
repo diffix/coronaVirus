@@ -12,9 +12,9 @@ SELECT {lonlatRange}::float as lonlatRange, *
                             diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
                             substring(pickup_datetime, 12, 2) as time,
                             count(*),
-                            round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                            round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 2)::float8,
-                            round(avg(fare_amount)::numeric, 2)::float8 as avg
+                            round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 0)::float8,
+                            round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 0)::float8,
+                            round(avg(fare_amount)::numeric, 0)::float8 as avg
                             FROM taxi
                             GROUP BY 1, 2, 3) x
 WHERE time::integer % 4 = 0 AND
