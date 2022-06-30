@@ -48,18 +48,21 @@
 </div>
 <div class="map-overlay-top">
     <div class="map-overlay-inner">
-        <h2 id="title">NYC taxi trip data heatmap</h2>
+        <h2 id="title">New York City taxi trips</h2>
         <p>
             <input type="radio" id="pdRadioFareAmounts" value="fareAmounts" name="pdRadio" checked="true">
-            <label>Average trip fare [$]</label>
+            <label>Fare [$]</label>
         </p>
         <p>
             <input type="radio" id="pdRadioTripSpeed" value="tripSpeed" name="pdRadio">
-            <label>Average trip speed [mph]</label>
+            <label>Speed [mph]</label>
         </p>
         <p>
             <label id="time" for="tSlider">Loading ...</label>
             <input class="slider" id="tSlider" type="range" min="0" max="20" step="4" value="8"/>
+        </p>
+        <p>
+            <div id="legend"></div>
         </p>
     </div>
 </div>

@@ -53,6 +53,24 @@ const mapboxStyleUrl = 'mapbox://styles/mapbox/light-v10';
 const startCenter = [-73.935242, 40.730610];
 const startZoom = 13;
 
+/*
+ * The average fare and speed to gauge the colors with:
+ * prop_test=# SELECT avg(fare_amount) FROM taxi;
+ *         avg         
+ * --------------------
+ *  11.566858325464596
+ * (1 row)
+ * 
+ * prop_test=# SELECT sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600 FROM taxi;
+ *       ?column?      
+ * --------------------
+ *  14.613886791653774
+ * (1 row)
+ * 
+ * Colors are coming from https://colorbrewer2.org/?type=diverging&scheme=PuOr&n=3
+ */
+const [colorHighest, colorAvg, colorLowest] = ['#f1a340','#f7f7f7','#998ec3'];
+
 function initializePage(parsed) {
     conf = parsed;
     const startSeconds = conf.startSeconds;
@@ -93,6 +111,24 @@ function initializePage(parsed) {
     // running over it.
     map.addControl(new mapboxgl.NavigationControl());
     map2.addControl(new mapboxgl.NavigationControl());
+
+    const legend = document.getElementById('legend');
+    const colors = [colorHighest, colorAvg, colorLowest];
+    const descriptions = ['High', 'Average', 'Low']
+
+    colors.forEach((color, i) => {
+        const description = descriptions[i];
+        const item = document.createElement('div');
+        const key = document.createElement('span');
+        key.className = 'legend-key';
+        key.style.backgroundColor = color;
+
+        const value = document.createElement('span');
+        value.innerHTML = `${description}`;
+        item.appendChild(key);
+        item.appendChild(value);
+        legend.appendChild(item);
+    });
 }
 
 function prepareMap() {
@@ -107,22 +143,6 @@ function prepareMap() {
         }
     }
 }
-
-/*
- * The average fare and speed to gauge the colors with:
- * prop_test=# SELECT avg(fare_amount) FROM taxi;
- *         avg         
- * --------------------
- *  11.566858325464596
- * (1 row)
- * 
- * prop_test=# SELECT sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600 FROM taxi;
- *       ?column?      
- * --------------------
- *  14.613886791653774
- * (1 row)
- */
-const [colorHighest, colorAvg, colorLowest] = ['#f1a340','#f7f7f7','#998ec3'];
 
 function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
     const geoWidth = parseFloat(dataSetConf.geoWidth);
