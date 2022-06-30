@@ -67,9 +67,9 @@ const startZoom = 13;
  *  14.613886791653774
  * (1 row)
  * 
- * Colors are coming from https://colorbrewer2.org/?type=diverging&scheme=PuOr&n=3
+ * Colors are coming from https://colorbrewer2.org/?type=diverging&scheme=RdYlBu&n=3
  */
-const [colorHighest, colorAvg, colorLowest] = ['#f1a340','#f7f7f7','#998ec3'];
+const [colorHighest, colorAvg, colorLowest] = ['#fc8d59','#ffffbf','#91bfdb'];
 
 function initializePage(parsed) {
     conf = parsed;
