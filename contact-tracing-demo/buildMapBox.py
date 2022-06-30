@@ -62,7 +62,7 @@ protocolMpi = "https"
 hostMpi = "people.mpi-sws.org"
 mapBoxPathMpi = "~munz/mapbox"
 
-title = "Encounter heatmap of KL"
+title = "NYC taxi trips - Diffix for PostgreSQL"
 cloak = MapBoxCloakAccess()
 
 confLst = list()

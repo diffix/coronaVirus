@@ -71,6 +71,26 @@ body {
     cursor: ew-resize;
 }
 
+.map-overlay-caption-left {
+    font: 8px/10px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    text-align: center;
+    position: absolute;
+    right: 12px;
+    bottom: 50px;
+    z-index: 1;
+    /* rotate: 90deg; */
+}
+
+.map-overlay-caption-right {
+    font: 8px/10px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    text-align: center;
+    position: absolute;
+    left: 12px;
+    bottom: 50px;
+    z-index: 1;
+    /* rotate: 90deg; */
+}
+
 .slider {
     width: 100%;
 }

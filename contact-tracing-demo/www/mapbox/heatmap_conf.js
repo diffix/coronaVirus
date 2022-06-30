@@ -135,6 +135,21 @@ function initializePage(parsed) {
         descriptionsRow.appendChild(descriptionItem);
         colorsRow.appendChild(colorItem);
     });
+
+    const rawCaption = document.createElement('div')
+    const rawCaptionContent = document.createElement('h2')
+    rawCaptionContent.textContent = "Raw"
+    rawCaption.appendChild(rawCaptionContent)
+    rawCaption.className = 'map-overlay-caption-left'
+    const anonymizedCaption = document.createElement('div')
+    const anonymizedCaptionContent = document.createElement('h2')
+    anonymizedCaptionContent.textContent = "Anonymized with Diffix for PostgreSQL"
+    anonymizedCaption.appendChild(anonymizedCaptionContent)
+    anonymizedCaption.className = 'map-overlay-caption-right'
+
+    const compare = document.getElementsByClassName('mapboxgl-compare')[0]
+    compare.appendChild(anonymizedCaption)
+    compare.appendChild(rawCaption)
 }
 
 function prepareMap() {
