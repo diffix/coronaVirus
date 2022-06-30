@@ -1,4 +1,4 @@
-function updateFilter() {
+function updateFilter(startSeconds) {
     const tChoice = parseInt(document.getElementById('tSlider').value, 10);
     filterBy(startSeconds + tChoice * 3600);
 }
@@ -51,7 +51,7 @@ function updateDataSet() {
 
 function initializePage(parsed) {
     conf = parsed;
-    startSeconds = conf.startSeconds;
+    const startSeconds = conf.startSeconds;
     mapboxgl.accessToken = conf.accessToken;
     map = new mapboxgl.Map({
         container: 'map',
@@ -67,13 +67,13 @@ function initializePage(parsed) {
     });
     map2.on('load', function () {
         prepareMap();
-        filterBy(startSeconds);
+        updateFilter(startSeconds);
         updateDataSet();
         document.title = conf.title;
         document
             .getElementById('tSlider')
             .addEventListener('input', function () {
-                updateFilter();
+                updateFilter(startSeconds);
             });
         document
             .querySelectorAll('input[name="pdRadio"]')
@@ -283,7 +283,6 @@ let map = null
 let map2 = null
 let conf = null;
 let timer = null;
-let startSeconds = null;
 let currentDataSet = -1;
 
 fetch(urlParams.get('conf'))
