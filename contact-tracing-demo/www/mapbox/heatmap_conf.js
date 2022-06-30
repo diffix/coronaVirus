@@ -113,21 +113,27 @@ function initializePage(parsed) {
     map2.addControl(new mapboxgl.NavigationControl());
 
     const legend = document.getElementById('legend');
-    const colors = [colorHighest, colorAvg, colorLowest];
-    const descriptions = ['High', 'Average', 'Low']
+    const descriptions = ['High', 'Average', 'Low'].reverse()
+    const colors = [colorHighest, colorAvg, colorLowest].reverse();
+    const descriptionsRow = document.createElement('tr')
+    const colorsRow = document.createElement('tr')
+    legend.appendChild(descriptionsRow);
+    legend.appendChild(colorsRow);
 
     colors.forEach((color, i) => {
         const description = descriptions[i];
-        const item = document.createElement('div');
+        const descriptionItem = document.createElement('td');
+        const colorItem = document.createElement('td');
         const key = document.createElement('span');
         key.className = 'legend-key';
         key.style.backgroundColor = color;
 
         const value = document.createElement('span');
         value.innerHTML = `${description}`;
-        item.appendChild(key);
-        item.appendChild(value);
-        legend.appendChild(item);
+        descriptionItem.appendChild(value);
+        colorItem.appendChild(key);
+        descriptionsRow.appendChild(descriptionItem);
+        colorsRow.appendChild(colorItem);
     });
 }
 
