@@ -1,4 +1,3 @@
-import datetime
 import copy
 
 from cloakConfig import CloakConfig
@@ -10,14 +9,14 @@ SELECT {lonlatRange}::float as lonlatRange, *
                     FROM (SELECT
                             diffix.floor_by(pickup_latitude, {lonlatRange}) as lat,
                             diffix.floor_by(pickup_longitude, {lonlatRange}) as lon,
-                            substring(pickup_datetime, 12, 2) as time,
+                            substring(pickup_datetime, 12, 2) as hour_of_day,
                             count(*),
                             round((sum(fare_amount) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 0)::float8,
                             round((sum(trip_distance) / NULLIF(sum(trip_time_in_secs), 0) * 3600)::numeric, 0)::float8,
                             round(avg(fare_amount)::numeric, 0)::float8 as avg
                             FROM taxi
                             GROUP BY 1, 2, 3) x
-WHERE time::integer % 4 = 0 AND
+WHERE hour_of_day::integer % 4 = 0 AND
       count >= {countThresh} AND
       avg IS NOT NULL;
 """
@@ -30,7 +29,7 @@ def _lonlatSteps(start, parentRange, childRange):
 def _hasDistinctChild(parentBucket, childRange, bucketsByLatlon):
     for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, childRange):
         for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, childRange):
-            childValue = dict.get(bucketsByLatlon, (childLat, childLon, parentBucket.time))
+            childValue = dict.get(bucketsByLatlon, (childLat, childLon, parentBucket.hourOfDay))
             if childValue and childValue != parentBucket.fareAmounts:
                 return True
     return False
@@ -39,7 +38,7 @@ def _hasDistinctChild(parentBucket, childRange, bucketsByLatlon):
 def _hasChild(parentBucket, childRange, bucketsByLatlon):
     for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, childRange):
         for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, childRange):
-            if (childLat, childLon, parentBucket.time) in bucketsByLatlon:
+            if (childLat, childLon, parentBucket.hourOfDay) in bucketsByLatlon:
                 return True
     return False
 
@@ -53,7 +52,7 @@ def _copyAndSetLonlat(bucket, lat, lon, lonlatRange):
 
 
 def _putBucket(bucketsByLatlon, bucket):
-    bucketsByLatlon[(bucket.lat, bucket.lon, bucket.time)] = bucket.fareAmounts
+    bucketsByLatlon[(bucket.lat, bucket.lon, bucket.hourOfDay)] = bucket.fareAmounts
 
 
 def _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon, fillWithSplitBuckets=False):
@@ -92,7 +91,7 @@ def _appendParentBucket(parentBucket, lonlatRange, buckets, bucketsByLatlon, fil
                 # fill the missing buckets with parent data
                 for childLat in _lonlatSteps(parentBucket.lat, parentBucket.lonlatRange, lonlatRange):
                     for childLon in _lonlatSteps(parentBucket.lon, parentBucket.lonlatRange, lonlatRange):
-                        if (childLat, childLon, parentBucket.time) not in bucketsByLatlon:
+                        if (childLat, childLon, parentBucket.hourOfDay) not in bucketsByLatlon:
                             parentBucketCopy = _copyAndSetLonlat(parentBucket, childLat, childLon, lonlatRange)
                             buckets.append(parentBucketCopy)
                             _putBucket(bucketsByLatlon, parentBucketCopy)
@@ -135,10 +134,7 @@ def _rowToBucket(row):
     rangeArea = lonlatRange ** 2
     lat = row[1]
     lon = row[2]
-    # FIXME: if we end up doing this like that (aggregating hour-by-hour data for entire range of dates)
-    #        we should rather export the hour, not the datetime as timestamp
-    date = datetime.datetime(year=2013, month=1, day=1)
-    time = date.combine(date, datetime.time(hour=int(row[3])))
+    hourOfDay = int(row[3])
     count = row[4]
     hourlyRates = row[5]
     tripSpeed = row[6]
@@ -146,7 +142,7 @@ def _rowToBucket(row):
     return MapBoxBucket(
         lat,
         lon,
-        time=time,
+        hourOfDay=hourOfDay,
         count=count,
         lonlatRange=lonlatRange,
         hourlyRates=hourlyRates,
@@ -156,10 +152,10 @@ def _rowToBucket(row):
 
 
 class MapBoxBucket:
-    def __init__(self, lat, lon, time=None, count=-1, lonlatRange=None, hourlyRates=None, tripSpeed=None, fareAmounts=None):
+    def __init__(self, lat, lon, hourOfDay=None, count=-1, lonlatRange=None, hourlyRates=None, tripSpeed=None, fareAmounts=None):
         self.lat = lat
         self.lon = lon
-        self.time = time
+        self.hourOfDay = hourOfDay
         self.count = count
         self.lonlatRange = lonlatRange
         self.hourlyRates = hourlyRates
@@ -172,5 +168,5 @@ class MapBoxBucket:
     __repr__ = __str__
 
     def listOfStrings(self):
-        return [f"{v}" for v in [self.lat, self.lon, self.time, self.count, self.lonlatRange, self.hourlyRates, self.tripSpeed,
+        return [f"{v}" for v in [self.lat, self.lon, self.hourOfDay, self.count, self.lonlatRange, self.hourlyRates, self.tripSpeed,
                                  self.fareAmounts] if v is not None]

@@ -1,10 +1,10 @@
-function updateFilter(startSeconds) {
+function updateFilter() {
     const tChoice = parseInt(document.getElementById('tSlider').value, 10);
-    filterBy(startSeconds + tChoice * 3600);
+    filterBy(tChoice);
 }
 
-function filterBy(seconds) {
-    let filters = ['==', 'time', seconds];
+function filterBy(hourOfDay) {
+    let filters = ['==', 'hourOfDay', hourOfDay];
 
     for (dataSetConf of conf.dataSets) {
         const mapElement = dataSetConf.isRaw ? map2 : map
@@ -14,8 +14,7 @@ function filterBy(seconds) {
         mapElement.setFilter(dataSetConf.name + '-values-tripSpeed', filters);
         mapElement.setFilter(dataSetConf.name + '-rectangles', filters);
     }
-    let date = new Date(seconds * 1000)
-    const time = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    const time = `${hourOfDay.toString().padStart(2, "0")}:00`;
     document.getElementById('time').textContent = 'Time: ' + time;
 }
 
@@ -73,7 +72,6 @@ const [colorHighest, colorAvg, colorLowest] = ['#fc8d59','#ffffbf','#91bfdb'];
 
 function initializePage(parsed) {
     conf = parsed;
-    const startSeconds = conf.startSeconds;
     mapboxgl.accessToken = conf.accessToken;
     map = new mapboxgl.Map({
         container: 'map',
@@ -89,13 +87,13 @@ function initializePage(parsed) {
     });
     map2.on('load', function () {
         prepareMap();
-        updateFilter(startSeconds);
+        updateFilter();
         updateDataSet();
         document.title = conf.title;
         document
             .getElementById('tSlider')
             .addEventListener('input', function () {
-                updateFilter(startSeconds);
+                updateFilter();
             });
         document
             .querySelectorAll('input[name="pdRadio"]')
@@ -337,8 +335,6 @@ if (!urlParams.has('conf')) {
 let map = null
 let map2 = null
 let conf = null;
-let timer = null;
-let currentDataSet = -1;
 
 fetch(urlParams.get('conf'))
     .then(response => {

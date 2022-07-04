@@ -31,7 +31,7 @@ class MapBoxGeoJsonEncoder:
             MapBoxGeoJsonEncoder._encodeAsPolygon(bucket.lat, bucket.lon, latWidth, lonWidth),
             'type': 'Feature',
             'properties': {
-                'time': round(bucket.time.timestamp()) if bucket.time is not None else -1,
+                'hourOfDay': bucket.hourOfDay,
                 'fare_amounts': bucket.fareAmounts,
                 'trip_speed': bucket.tripSpeed,
                 # FIXME we really need to simplify this to not allow latWidth<>lon

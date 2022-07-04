@@ -1,4 +1,3 @@
-import datetime
 import http.server
 import json
 import os.path
@@ -26,27 +25,10 @@ class MapBoxCreator:
         return polygonsFileRelativePath, centersFileRelativePath
 
     @staticmethod
-    def _findStartSeconds(buckets):
-        minTime = datetime.datetime(year=2100, month=1, day=1, hour=0, minute=0, second=0)
-        maxTime = datetime.datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0)
-        for bucket in buckets:
-            if bucket.time < minTime:
-                minTime = bucket.time
-            if maxTime < bucket.time:
-                maxTime = bucket.time
-        minTime = datetime.datetime.combine(minTime.date(), datetime.time(hour=0, minute=0, second=0))
-        if datetime.timedelta(days=7) < (maxTime - minTime):
-            print(f"Warning, mapbox for more than 7 days requested. Max 7 days supported.")
-            print(f"MinTime: {minTime}")
-            print(f"MaxTime: {maxTime}")
-        return round(minTime.timestamp())
-
-    @staticmethod
     def _createMapLink(title, conf, protocol, host, port, mapboxPath):
         return f"{protocol}://{host}{'' if port is None else f':{port}'}/{mapboxPath}/heatmap.html?" \
                f"title={urllib.parse.quote(title)}&" \
                f"subtitle={urllib.parse.quote(conf['subtitle'])}&" \
-               f"startSeconds={conf['startSeconds']}&" \
                f"geoWidth={conf['geoWidth']}&" \
                f"polygonsFilePath={urllib.parse.quote(conf['polygonsFileRelativePath'])}&" \
                f"centersFilePath={urllib.parse.quote(conf['centersFileRelativePath'])}&" \
@@ -63,7 +45,6 @@ class MapBoxCreator:
             'subtitle': subtitle,
             'polygonsFileRelativePath': polygonsFileRelativePath,
             'centersFileRelativePath': centersFileRelativePath,
-            'startSeconds': MapBoxCreator._findStartSeconds(buckets),
             'geoWidth': max(round((latWidth + lonWidth) / 2.0, 6), 0.000001),
             'isRaw': raw,
         }
@@ -83,18 +64,13 @@ class MapBoxCreator:
     def createMergedMap(name, title, confLst, mapBoxPath=None):
         if mapBoxPath is None:
             mapBoxPath = os.path.join('www', 'mapbox')
-        startSeconds = sys.maxsize
         localConfLst = list()
         for conf in confLst:
-            if conf['startSeconds'] < startSeconds:
-                startSeconds = conf['startSeconds']
             localConf = conf.copy()
-            del localConf['startSeconds']
             localConfLst.append(localConf)
         conf = {
             'title': title,
             'accessToken': MapBoxConfig.parameters['accessToken'],
-            'startSeconds': startSeconds,
             'dataSets': localConfLst,
         }
         confPath = os.path.join(mapBoxPath, 'conf')
