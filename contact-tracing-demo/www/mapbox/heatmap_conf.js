@@ -141,7 +141,7 @@ function initializePage(parsed) {
     rawCaption.className = 'map-overlay-caption-left'
     const anonymizedCaption = document.createElement('div')
     const anonymizedCaptionContent = document.createElement('h2')
-    anonymizedCaptionContent.textContent = "Anonymized with Diffix for PostgreSQL"
+    anonymizedCaptionContent.textContent = "Anonymized"
     anonymizedCaption.appendChild(anonymizedCaptionContent)
     anonymizedCaption.className = 'map-overlay-caption-right'
 
