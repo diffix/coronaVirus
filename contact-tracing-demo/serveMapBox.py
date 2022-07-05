@@ -24,9 +24,9 @@ class MapBoxServer:
     @staticmethod
     def serve():
         handler = http.server.SimpleHTTPRequestHandler
-        with socketserver.TCPServer(("", 8000), handler) as httpd:
-            print("--------------------------------------------------")
-            print(f"Serving http at port 8000")
-            httpd.serve_forever()
+        server = socketserver.TCPServer(("", 8000), handler)
+        print("--------------------------------------------------")
+        print("Serving http at port 8000")
+        server.serve_forever()
 
 MapBoxServer.serve()
