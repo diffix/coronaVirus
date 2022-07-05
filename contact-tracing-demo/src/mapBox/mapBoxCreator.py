@@ -25,16 +25,6 @@ class MapBoxCreator:
         return polygonsFileRelativePath, centersFileRelativePath
 
     @staticmethod
-    def _createMapLink(title, conf, protocol, host, port, mapboxPath):
-        return f"{protocol}://{host}{'' if port is None else f':{port}'}/{mapboxPath}/heatmap.html?" \
-               f"title={urllib.parse.quote(title)}&" \
-               f"subtitle={urllib.parse.quote(conf['subtitle'])}&" \
-               f"geoWidth={conf['geoWidth']}&" \
-               f"polygonsFilePath={urllib.parse.quote(conf['polygonsFileRelativePath'])}&" \
-               f"centersFilePath={urllib.parse.quote(conf['centersFileRelativePath'])}&" \
-               f"accessToken={urllib.parse.quote(MapBoxConfig.parameters['accessToken'])}"
-
-    @staticmethod
     def createMap(name, subtitle, buckets, latWidth, lonWidth, mapBoxPath=None, raw=False):
         if mapBoxPath is None:
             mapBoxPath = os.path.join('www', 'mapbox')
@@ -48,17 +38,6 @@ class MapBoxCreator:
             'geoWidth': max(round((latWidth + lonWidth) / 2.0, 6), 0.000001),
             'isRaw': raw,
         }
-
-    @staticmethod
-    def _createMergedMapLinks(conf, protocol, host, port, mapboxPath):
-        mainLink = f"{protocol}://{host}{'' if port is None else f':{port}'}/{mapboxPath}/heatmap_conf.html?" \
-                   f"conf={conf['confFileRelativePath']}"
-        directLinks = list()
-        for i in range(len(conf['conf']['dataSets'])):
-            directLinks.append((conf['conf']['dataSets'][i]['name'],
-                                f"{protocol}://{host}{'' if port is None else f':{port}'}/"
-                                f"{mapboxPath}/heatmap_conf.html?conf={conf['confFileRelativePath']}&ds={i}"))
-        return mainLink, directLinks
 
     @staticmethod
     def createMergedMap(name, title, confLst, mapBoxPath=None):
@@ -83,28 +62,6 @@ class MapBoxCreator:
             'conf': conf,
             'confFileRelativePath': confFileRelativePath,
         }
-
-    @staticmethod
-    def printLinks(name, title, confLst=None, conf=None, protocol="http", host="localhost", port=8000,
-                   mapBoxPath="www/mapbox"):
-        if confLst is None and conf is None:
-            return
-
-        print("--------------------------------------------------")
-        print(f"{name} Links")
-        if confLst is not None:
-            print(f"   Single Map Links:")
-            for c in confLst:
-                link = MapBoxCreator._createMapLink(title, c, protocol, host, port, mapBoxPath)
-                print(f"      {c['name']} ---> {link}")
-        if conf is not None:
-            print(f"   Merged Map Links:")
-            mainLink, directLinks = MapBoxCreator._createMergedMapLinks(conf, protocol, host, port, mapBoxPath)
-            print(f"      Direct Links:")
-            for n, l in directLinks:
-                print(f"         {n} ---> {l}")
-            print(f"      Main Link:")
-            print(f"         {mainLink}")
 
     @staticmethod
     def serve():

@@ -7,7 +7,7 @@ Utility to crudely share the heatmap prototype
 
 1. `cd` into the dir holding this file
 2. `python3 serveMapBox.py`
-3. Point browser to http://localhost:8000/www/mapbox/heatmap_conf.html?conf=conf/encounters.json
+3. Point browser to http://localhost:8000/www/mapbox
 4. Wait until dust settles
 6. Zoom in and out to have things load and become smooth
 7. Should be fine now. Looks best at the closest zoom level.

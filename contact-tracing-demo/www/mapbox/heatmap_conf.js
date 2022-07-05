@@ -329,14 +329,11 @@ function addDataSet(mapElement, dataSetConf, minGeoWidth, maxGeoWidth) {
 
 const urlParams = new URLSearchParams(window.location.search);
 const initialDataSet = urlParams.has('ds') ? parseInt(urlParams.get('ds'), 10) : 0;
-if (!urlParams.has('conf')) {
-    throw new Error("URL parameters do not contain 'conf'!");
-}
 let map = null
 let map2 = null
 let conf = null;
 
-fetch(urlParams.get('conf'))
+fetch('conf/taxi-heatmap.json')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');

@@ -163,7 +163,7 @@ class MapBoxBucket:
         self.fareAmounts = fareAmounts
 
     def __str__(self):
-        return f"MapBoxEncounters: {self.listOfStrings()}"
+        return f"MapBoxTaxiHeatmap: {self.listOfStrings()}"
 
     __repr__ = __str__
 
